@@ -98,7 +98,7 @@ def generate_info(commit_msgs: str) -> (str, datetime, int):
         return result
 
     msgs = commit_msgs.split("\n")
-    msgs = map(msg_parser, msgs)
+    msgs: [(str, datetime, int)] = list(map(msg_parser, msgs))
     first_msg = msgs[0]
     last_msg = msgs[-1]
 
@@ -107,7 +107,7 @@ def generate_info(commit_msgs: str) -> (str, datetime, int):
 
     duration: timedelta = start_date - end_date
 
-    result_str: str = "--Autocreated activity--"\
+    result_str: str = "--Autocreated activity--"
     result_str += "\n".join(map(lambda m: "SHA: " + m[0] + "\nMessage: " + m[1] + "\n-----", msgs))
     return result_str, start_date, duration.total_seconds() / 60
 
@@ -118,4 +118,4 @@ if __name__ == '__main__':
     parser.add_argument('--commit-msgs', help="Commit messages", required=True)
     args = parser.parse_args()
 
-    collect_data(Config.config(args.debug), "Empresa 1", "Test Project", "Maquetador", True)
+    collect_data(Config.config(args.debug), "Empresa 1", "Test Project", "Maquetador", True, commit_msgs=args.commit_msgs)

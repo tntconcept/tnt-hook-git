@@ -9,7 +9,7 @@ from entities import Organization, Project
 class DateTimeEncoder(json.JSONEncoder):
     def default(self, o: Any) -> Any:
         if isinstance(o, datetime):
-            return o.isoformat()
+            return o.utcnow().isoformat()
         return json.JSONEncoder.default(self, o)
 
 
