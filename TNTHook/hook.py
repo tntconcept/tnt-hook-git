@@ -1,14 +1,14 @@
 from __future__ import annotations
+
 import json
-import argparse
-import calendar
-from datetime import date, timedelta
+from datetime import timedelta
 from typing import List
 
 import requests
 from requests import Response
-from entities import *
-from utils import DateTimeEncoder, first, to_class
+
+from TNTHook.entities import *
+from TNTHook.utils import DateTimeEncoder, first, to_class
 
 
 class Config:
@@ -30,12 +30,12 @@ class Config:
                           authURL="http://localhost:8080/oauth/token")
 
 
-def collect_data(config: Config,
-                 organization_name: str,
-                 project_name: str,
-                 role_name: str,
-                 billable: bool,
-                 commit_msgs: str):
+def create_activity(config: Config,
+                    organization_name: str,
+                    project_name: str,
+                    role_name: str,
+                    billable: bool,
+                    commit_msgs: str):
     headers = {"Authorization": "Basic dG50LWNsaWVudDpob2xh"}
     payload = {"grant_type": "password",
                "username": "testuser",
@@ -110,12 +110,3 @@ def generate_info(commit_msgs: str) -> (str, datetime, int):
     result_str: str = "--Autocreated activity--"
     result_str += "\n".join(map(lambda m: "SHA: " + m[0] + "\nMessage: " + m[1] + "\n-----", msgs))
     return result_str, start_date, duration.total_seconds() / 60
-
-
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description="TNTHook")
-    parser.add_argument('--debug', action='store_const', const=True, default=False)
-    parser.add_argument('--commit-msgs', help="Commit messages", required=True)
-    args = parser.parse_args()
-
-    collect_data(Config.config(args.debug), "Empresa 1", "Test Project", "Maquetador", True, commit_msgs=args.commit_msgs)
