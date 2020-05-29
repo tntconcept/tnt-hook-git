@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import json
-from datetime import timedelta
-from typing import List
+from datetime import timedelta, datetime
+from getpass import getpass
+from typing import List, Tuple
 
+import keyring
 import requests
 from requests import Response
 
@@ -30,16 +32,29 @@ class Config:
                           authURL="http://localhost:8080/oauth/token")
 
 
+def ask_credentials():
+    keyring.set_password("com.autentia.TNTHook", "username", input("User: "))
+    keyring.set_password("com.autentia.TNTHook", "password", getpass())
+
+
 def create_activity(config: Config,
                     organization_name: str,
                     project_name: str,
                     role_name: str,
                     billable: bool,
-                    commit_msgs: str):
+                    commit_msgs: str,
+                    prev_commit_date_str: str):
+
+    username = keyring.get_password("com.autentia.TNTHook", "username")
+    password = keyring.get_password("com.autentia.TNTHook", "password")
+
+    if not username or not password:
+        raise Exception('No credentials')
+
     headers = {"Authorization": "Basic dG50LWNsaWVudDpob2xh"}
     payload = {"grant_type": "password",
-               "username": "testuser",
-               "password": "holahola"}
+               "username": username,
+               "password": password}
     token_response = requests.post(config.authURL, headers=headers, data=payload)
     access_token = token_response.json()["access_token"]
 
@@ -68,14 +83,10 @@ def create_activity(config: Config,
     if not role:
         raise Exception('Not found', role_name)
 
+    prev_commit_date = datetime.fromisoformat(prev_commit_date_str) if prev_commit_date_str else None
 
-    # start = date.today().replace(day=1)
-    # next_month = calendar.nextmonth(start.year, start.month)
-    # end = start.replace(year=next_month[0], month=next_month[1])
-    # params = {"startDate": start, "endDate": end}
-    # response: Response = requests.get(config.baseURL + "activities", headers=headers, params=params)
-    # print(response.json())
-    info: (str, datetime, int) = generate_info(commit_msgs)
+    info: (str, datetime, int) = generate_info(commit_msgs,
+                                               prev_commit_date=prev_commit_date)
 
     new_activity: CreateActivityRequest = CreateActivityRequest()
     new_activity.description = info[0]
@@ -91,22 +102,22 @@ def create_activity(config: Config,
     print(response.status_code)
 
 
-def generate_info(commit_msgs: str) -> (str, datetime, int):
-    def msg_parser(msg: str) -> (str, datetime, int):
+def generate_info(commit_msgs: str, prev_commit_date: datetime) -> (str, datetime, int):
+    def msg_parser(msg: str) -> Tuple[str, str, datetime]:
         result = msg.split(";")
         result[2] = datetime.fromisoformat(result[2])
         return result
 
-    msgs = commit_msgs.split("\n")
-    msgs: [(str, datetime, int)] = list(map(msg_parser, msgs))
+    lines = commit_msgs.split("\n")
+    msgs: [Tuple[str, str, datetime]] = list(map(msg_parser, lines))
     first_msg = msgs[0]
     last_msg = msgs[-1]
 
-    start_date: datetime = first_msg[2]
+    start_date: datetime = prev_commit_date or first_msg[2]
     end_date: datetime = last_msg[2]
 
-    duration: timedelta = start_date - end_date
+    duration: timedelta = end_date - start_date
 
-    result_str: str = "--Autocreated activity--"
-    result_str += "\n".join(map(lambda m: "SHA: " + m[0] + "\nMessage: " + m[1] + "\n-----", msgs))
+    result_str: str = "--Autocreated activity--\n"
+    result_str += "\n-----\n".join(map(lambda m: "SHA: " + m[0] + "\nMessage: " + m[1], msgs))
     return result_str, start_date, duration.total_seconds() / 60
