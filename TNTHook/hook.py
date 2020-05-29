@@ -99,7 +99,8 @@ def create_activity(config: Config,
     data = json.loads(json_str)
 
     response: Response = requests.post(config.baseURL + "activities", headers=headers, json=data)
-    print(response.status_code)
+    if response.status_code == 200:
+        print("Successfully created activity for " + project_name + " - " + role_name)
 
 
 def generate_info(commit_msgs: str, prev_commit_date: datetime) -> (str, datetime, int):
