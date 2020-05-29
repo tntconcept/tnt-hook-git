@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="TNTHook",
-    version="0.0.1",
+    version="0.0.2",
     author="Daniel Otero",
     author_email="dotero@autentia.com",
     description="A small example package",
