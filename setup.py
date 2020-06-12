@@ -5,10 +5,10 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="TNTHook",
-    version="0.0.2",
+    version="0.0.3",
     author="Daniel Otero",
     author_email="dotero@autentia.com",
-    description="A small example package",
+    description="Utility to auto imputate activities in TNT",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://gitlab.com/tntutils/TNTHook-Python.git",

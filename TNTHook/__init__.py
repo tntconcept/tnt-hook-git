@@ -2,15 +2,8 @@ import argparse
 import json
 import os
 
-from TNTHook.hook import create_activity, Config, ask_credentials
+from TNTHook.hook import create_activity, Config, ask_credentials, PrjConfig
 from TNTHook.utils import to_class
-
-
-class PrjConfig:
-    organization: str
-    project: str
-    role: str
-    billable: bool
 
 
 def main(argv=None):
@@ -35,10 +28,7 @@ def main(argv=None):
     with open(config_file) as config_file:
         prj_config: PrjConfig = json.load(config_file, object_hook=lambda x: to_class(x, PrjConfig))
 
-        create_activity(Config.config(args.debug),
-                        prj_config.organization,
-                        prj_config.project,
-                        prj_config.role,
-                        prj_config.billable,
+        create_activity(config=Config.config(args.debug),
+                        prj_config=prj_config,
                         commit_msgs=args.commit_msgs,
                         prev_commit_date_str=args.prev_commit_date_str)

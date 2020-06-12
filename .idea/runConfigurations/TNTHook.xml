@@ -12,7 +12,7 @@
     <option name="ADD_CONTENT_ROOTS" value="true" />
     <option name="ADD_SOURCE_ROOTS" value="true" />
     <option name="SCRIPT_NAME" value="$PROJECT_DIR$/TNTHook" />
-    <option name="PARAMETERS" value="--commit-msgs d01379a014a94c42ce55362a5ac7e0036fe4b374;Did nothing;2020-05-29T12:20:13+02:00 --prev-commit-date-str 2020-05-29T12:01:16+02:00" />
+    <option name="PARAMETERS" value="--commit-msgs &quot;d01379a014a94c42ce55362a5ac7e0036fe4b374;Did nothing;2020-05-29T12:20:13+02:00&quot; --prev-commit-date-str 2020-05-29T12:01:16+02:00" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="false" />

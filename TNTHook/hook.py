@@ -28,8 +28,16 @@ class Config:
                           authURL="http://localhost:8080/oauth/token")
         else:
             # TODO: Change this
-            return Config(baseURL="http://localhost:8080/api/",
-                          authURL="http://localhost:8080/oauth/token")
+            return Config(baseURL="https://autentia.no-ip.org/tntconcept-api-rest-kotlin/api/",
+                          authURL="https://autentia.no-ip.org/tntconcept-api-rest-kotlin/oauth/token")
+
+
+class PrjConfig:
+    organization: str
+    project: str
+    role: str
+    billable: bool = False
+    activity_prefix: str = None
 
 
 def ask_credentials():
@@ -38,12 +46,13 @@ def ask_credentials():
 
 
 def create_activity(config: Config,
-                    organization_name: str,
-                    project_name: str,
-                    role_name: str,
-                    billable: bool,
+                    prj_config: PrjConfig,
                     commit_msgs: str,
                     prev_commit_date_str: str):
+    organization_name = prj_config.organization
+    project_name = prj_config.project
+    role_name = prj_config.role
+    billable = prj_config.billable
 
     username = keyring.get_password("com.autentia.TNTHook", "username")
     password = keyring.get_password("com.autentia.TNTHook", "password")
@@ -86,7 +95,8 @@ def create_activity(config: Config,
     prev_commit_date = datetime.fromisoformat(prev_commit_date_str) if prev_commit_date_str else None
 
     info: (str, datetime, int) = generate_info(commit_msgs,
-                                               prev_commit_date=prev_commit_date)
+                                               prev_commit_date=prev_commit_date,
+                                               prefix=prj_config.activity_prefix)
 
     new_activity: CreateActivityRequest = CreateActivityRequest()
     new_activity.description = info[0]
@@ -94,6 +104,8 @@ def create_activity(config: Config,
     new_activity.duration = info[2]
     new_activity.billable = billable
     new_activity.projectRoleId = role.id
+
+    print(new_activity.startDate, new_activity.duration)
 
     json_str = json.dumps(new_activity.__dict__, cls=DateTimeEncoder)
     data = json.loads(json_str)
@@ -103,22 +115,32 @@ def create_activity(config: Config,
         print("Successfully created activity for " + project_name + " - " + role_name)
 
 
-def generate_info(commit_msgs: str, prev_commit_date: datetime) -> (str, datetime, int):
+def generate_info(commit_msgs: str,
+                  prev_commit_date: datetime,
+                  prefix: str = None) -> (str, datetime, int):
+    prefix = prefix if prefix is not None else "--Autocreated activity--"
+
+    # Rounds time to quarter periods and remove timezone info
+    def adjust_time(time: datetime) -> datetime:
+        minute = time.minute
+        minute = int(minute / 15) * 15
+        return time.replace(minute=minute, second=0, microsecond=0, tzinfo=None)
+
     def msg_parser(msg: str) -> Tuple[str, str, datetime]:
-        result = msg.split(";")
-        result[2] = datetime.fromisoformat(result[2])
-        return result
+        items = msg.split(";")
+        date = datetime.fromisoformat(items[2])
+        return items[0], items[1], adjust_time(date)
 
     lines = commit_msgs.split("\n")
     msgs: [Tuple[str, str, datetime]] = list(map(msg_parser, lines))
     first_msg = msgs[0]
     last_msg = msgs[-1]
 
-    start_date: datetime = prev_commit_date or first_msg[2]
+    start_date: datetime = adjust_time(prev_commit_date or first_msg[2])
     end_date: datetime = last_msg[2]
 
     duration: timedelta = end_date - start_date
 
-    result_str: str = "--Autocreated activity--\n"
+    result_str: str = prefix + "\n"
     result_str += "\n-----\n".join(map(lambda m: "SHA: " + m[0] + "\nMessage: " + m[1], msgs))
-    return result_str, start_date, duration.total_seconds() / 60
+    return result_str, start_date, max(duration.total_seconds() / 60,15)

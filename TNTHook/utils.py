@@ -8,7 +8,7 @@ from TNTHook.entities import Organization
 class DateTimeEncoder(json.JSONEncoder):
     def default(self, o: Any) -> Any:
         if isinstance(o, datetime):
-            return o.utcnow().isoformat()
+            return o.isoformat()
         return json.JSONEncoder.default(self, o)
 
 
