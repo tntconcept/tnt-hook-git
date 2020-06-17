@@ -16,20 +16,24 @@ from TNTHook.utils import DateTimeEncoder, first, to_class
 class Config:
     baseURL: str
     authURL: str
+    basic_auth: str
 
-    def __init__(self, baseURL: str, authURL: str):
+    def __init__(self, baseURL: str, authURL: str, basic_auth: str):
         self.baseURL = baseURL
         self.authURL = authURL
+        self.basic_auth = basic_auth
 
     @staticmethod
     def config(debug: bool) -> Config:
         if debug:
             return Config(baseURL="http://localhost:8080/api/",
-                          authURL="http://localhost:8080/oauth/token")
+                          authURL="http://localhost:8080/oauth/token",
+                          basic_auth="dG50LWNsaWVudDpob2xh")
         else:
             # TODO: Change this
             return Config(baseURL="https://autentia.no-ip.org/tntconcept-api-rest-kotlin/api/",
-                          authURL="https://autentia.no-ip.org/tntconcept-api-rest-kotlin/oauth/token")
+                          authURL="https://autentia.no-ip.org/tntconcept-api-rest-kotlin/oauth/token",
+                          basic_auth="dG50LWNsaWVudDpDbGllbnQtVE5ULXYx")
 
 
 class PrjConfig:
@@ -60,11 +64,13 @@ def create_activity(config: Config,
     if not username or not password:
         raise Exception('No credentials')
 
-    headers = {"Authorization": "Basic dG50LWNsaWVudDpob2xh"}
+    headers = {"Authorization": "Basic " + config.basic_auth}
     payload = {"grant_type": "password",
                "username": username,
                "password": password}
     token_response = requests.post(config.authURL, headers=headers, data=payload)
+    if token_response.status_code != 200:
+        raise Exception("Authentication failed")
     access_token = token_response.json()["access_token"]
 
     headers = {"Authorization": "Bearer " + access_token}
@@ -122,6 +128,10 @@ def generate_info(commit_msgs: str,
 
     # Rounds time to quarter periods and remove timezone info
     def adjust_time(time: datetime) -> datetime:
+        # if activity was started previous day, "adjust" it to current push date at 8AM
+        today = datetime.now()
+        if time.day < today.day:
+            time = today.replace(hour=8, minute=0)
         minute = time.minute
         minute = int(minute / 15) * 15
         return time.replace(minute=minute, second=0, microsecond=0, tzinfo=None)
