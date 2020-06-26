@@ -52,7 +52,8 @@ def ask_credentials():
 def create_activity(config: Config,
                     prj_config: PrjConfig,
                     commit_msgs: str,
-                    prev_commit_date_str: str):
+                    prev_commit_date_str: str,
+                    remote: str):
     organization_name = prj_config.organization
     project_name = prj_config.project
     role_name = prj_config.role
@@ -102,7 +103,8 @@ def create_activity(config: Config,
 
     info: (str, datetime, int) = generate_info(commit_msgs,
                                                prev_commit_date=prev_commit_date,
-                                               prefix=prj_config.activity_prefix)
+                                               prefix=prj_config.activity_prefix,
+                                               remote_url=remote)
 
     new_activity: CreateActivityRequest = CreateActivityRequest()
     new_activity.description = info[0]
@@ -110,8 +112,6 @@ def create_activity(config: Config,
     new_activity.duration = info[2]
     new_activity.billable = billable
     new_activity.projectRoleId = role.id
-
-    print(new_activity.startDate, new_activity.duration)
 
     json_str = json.dumps(new_activity.__dict__, cls=DateTimeEncoder)
     data = json.loads(json_str)
@@ -123,8 +123,11 @@ def create_activity(config: Config,
 
 def generate_info(commit_msgs: str,
                   prev_commit_date: datetime,
-                  prefix: str = None) -> (str, datetime, int):
+                  prefix: str = None,
+                  remote_url: str = None) -> (str, datetime, int):
     prefix = prefix if prefix is not None else "--Autocreated activity--"
+    if remote_url is not None:
+        prefix += "\n" + remote_url
 
     # Rounds time to quarter periods and remove timezone info
     def adjust_time(time: datetime) -> datetime:

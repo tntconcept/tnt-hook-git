@@ -40,11 +40,18 @@ read local_ref local_sha remote_ref remote_sha
 
 if [ -n "$local_sha" ] && [ -n "$remote_sha" ]
 then
-  MSGS=`git log --pretty="format:%H;%s;%aI" $remote_sha..$local_sha`
-  PREV_DATE=`git log -1 --pretty="format:%aI" $remote_sha`
+  if [ $((16#$remote_sha)) -eq 0 ]
+  then
+    MSGS=`git log --pretty="format:%H;%s;%aI"`
+    PREV_DATE=`git log --reverse --pretty="format:%aI" | head -1`
+  else
+    MSGS=`git log --pretty="format:%H;%s;%aI" $remote_sha..$local_sha`
+    PREV_DATE=`git log -1 --pretty="format:%aI" $remote_sha`
+  fi
+  REMOTE=`git ls-remote --get-url | head -1`
 
   # Assumes TNTHook is on PATH
-  TNTHook --commit-msgs "$MSGS" --prev-commit-date-str "$PREV_DATE"
+  TNTHook --commit-msgs "$MSGS" --prev-commit-date-str "$PREV_DATE" --remote $REMOTE
 fi
 ```
 And give it execution permission:

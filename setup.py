@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="TNTHook",
-    version="0.0.4",
+    version="0.0.5",
     author="Daniel Otero",
     author_email="dotero@autentia.com",
     description="Utility to auto imputate activities in TNT",
