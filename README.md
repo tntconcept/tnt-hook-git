@@ -43,15 +43,13 @@ then
   if [ $((16#$remote_sha)) -eq 0 ]
   then
     MSGS=`git log --pretty="format:%H;%s;%aI"`
-    PREV_DATE=`git log --reverse --pretty="format:%aI" | head -1`
   else
     MSGS=`git log --pretty="format:%H;%s;%aI" $remote_sha..$local_sha`
-    PREV_DATE=`git log -1 --pretty="format:%aI" $remote_sha`
   fi
   REMOTE=`git ls-remote --get-url | head -1`
 
   # Assumes TNTHook is on PATH
-  TNTHook --commit-msgs "$MSGS" --prev-commit-date-str "$PREV_DATE" --remote $REMOTE
+  TNTHook --commit-msgs "$MSGS" --remote $REMOTE
 fi
 ```
 And give it execution permission:
@@ -64,7 +62,6 @@ Also create a file **.git/hooks/tnthookconfig.json** to indicate to which proyec
     "organization": "Some organization",
     "project": "Project",
     "role": "Role",
-    "billable": false
 }
 ```
 Once everything is set up, in order to set TNT login credentials, use the following command:

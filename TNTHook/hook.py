@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from datetime import timedelta, datetime
+from functools import reduce
 from getpass import getpass
 from typing import List, Tuple
 
@@ -10,6 +11,7 @@ import requests
 from requests import Response
 
 from TNTHook.entities import *
+from TNTHook.exceptions import NoCredentialsError, AuthError, NotFoundError
 from TNTHook.utils import DateTimeEncoder, first, to_class
 
 
@@ -40,9 +42,11 @@ class PrjConfig:
     organization: str
     project: str
     role: str
-    billable: bool = False
-    activity_prefix: str = None
     ignore_errors: bool = False
+
+    @staticmethod
+    def activity_prefix() -> str:
+        return "###Autocreated evidence###\n(DO NOT DELETE)"
 
 
 def ask_credentials():
@@ -53,18 +57,17 @@ def ask_credentials():
 def create_activity(config: Config,
                     prj_config: PrjConfig,
                     commit_msgs: str,
-                    prev_commit_date_str: str,
                     remote: str):
     organization_name = prj_config.organization
     project_name = prj_config.project
     role_name = prj_config.role
-    billable = prj_config.billable
+    billable = False
 
     username = keyring.get_password("com.autentia.TNTHook", "username")
     password = keyring.get_password("com.autentia.TNTHook", "password")
 
     if not username or not password:
-        raise Exception('No credentials')
+        raise NoCredentialsError()
 
     headers = {"Authorization": "Basic " + config.basic_auth}
     payload = {"grant_type": "password",
@@ -72,7 +75,7 @@ def create_activity(config: Config,
                "password": password}
     token_response = requests.post(config.authURL, headers=headers, data=payload)
     if token_response.status_code != 200:
-        raise Exception("Authentication failed")
+        raise AuthError()
     access_token = token_response.json()["access_token"]
 
     headers = {"Authorization": "Bearer " + access_token}
@@ -82,7 +85,7 @@ def create_activity(config: Config,
 
     organization = first(lambda o: o.name == organization_name, organizations)
     if not organization:
-        raise Exception('Not found', organization_name)
+        raise NotFoundError("Organization", organization_name)
 
     response: Response = requests.get(config.baseURL + "organizations/" + str(organization.id) + "/projects",
                                       headers=headers)
@@ -90,7 +93,7 @@ def create_activity(config: Config,
     project = first(lambda p: p.name == project_name, projects)
 
     if not project:
-        raise Exception('Not found', project_name)
+        raise NotFoundError("Project", project_name)
 
     response: Response = requests.get(config.baseURL + "projects/" + str(project.id) + "/roles",
                                       headers=headers)
@@ -98,19 +101,28 @@ def create_activity(config: Config,
     role = first(lambda r: r.name == role_name, roles)
 
     if not role:
-        raise Exception('Not found', role_name)
+        raise NotFoundError("Role", role_name)
 
-    prev_commit_date = datetime.fromisoformat(prev_commit_date_str) if prev_commit_date_str else None
+    now = datetime.now()
+    now = now.strftime("%Y-%m-%d")
+    response: Response = requests.get(config.baseURL + "activities/",
+                                      params={"startDate": str(now), "endDate": str(now)},
+                                      headers=headers)
+    activities_response: List[ActivitiesResponse]
+    activities_response = json.loads(response.text, object_hook=lambda x: to_class(x, cls=ActivitiesResponse))
+    activities = reduce(lambda r, a: r + a.activities, activities_response, [])
+    existing_activity = first(lambda a: PrjConfig.activity_prefix() in a.description, activities)
 
     info: (str, datetime, int) = generate_info(commit_msgs,
-                                               prev_commit_date=prev_commit_date,
-                                               prefix=prj_config.activity_prefix,
+                                               existing_activity,
                                                remote_url=remote)
 
     new_activity: CreateActivityRequest = CreateActivityRequest()
+    if existing_activity is not None:
+        new_activity.id = existing_activity.id
     new_activity.description = info[0]
     new_activity.startDate = info[1]
-    new_activity.duration = info[2]
+    new_activity.duration = 0
     new_activity.billable = billable
     new_activity.projectRoleId = role.id
 
@@ -123,38 +135,29 @@ def create_activity(config: Config,
 
 
 def generate_info(commit_msgs: str,
-                  prev_commit_date: datetime,
-                  prefix: str = None,
-                  remote_url: str = None) -> (str, datetime, int):
-    prefix = prefix if prefix is not None else "--Autocreated activity--"
-    if remote_url is not None:
-        prefix += "\n" + remote_url
+                  existing_activity: Activity = None,
+                  remote_url: str = None) -> (str, datetime):
+    prefix = PrjConfig.activity_prefix()
 
-    # Rounds time to quarter periods and remove timezone info
-    def adjust_time(time: datetime) -> datetime:
-        # if activity was started previous day, "adjust" it to current push date at 8AM
-        today = datetime.now()
-        if time.day < today.day:
-            time = today.replace(hour=8, minute=0)
-        minute = time.minute
-        minute = int(minute / 15) * 15
-        return time.replace(minute=minute, second=0, microsecond=0, tzinfo=None)
-
-    def msg_parser(msg: str) -> Tuple[str, str, datetime]:
+    def msg_parser(msg: str) -> Tuple[str, str, str]:
         items = msg.split(";")
-        date = datetime.fromisoformat(items[2])
-        return items[0], items[1], adjust_time(date)
+        # return items[0], items[1], items[2]
+        return items[0], items[1], items[2]
 
-    lines = commit_msgs.split("\n")
+    lines = commit_msgs.split("\n")[::-1]
     msgs: [Tuple[str, str, datetime]] = list(map(msg_parser, lines))
-    first_msg = msgs[0]
-    last_msg = msgs[-1]
 
-    start_date: datetime = adjust_time(prev_commit_date or first_msg[2])
-    end_date: datetime = last_msg[2]
+    start_date: datetime = datetime.now().replace(hour=8, minute=0, second=0, microsecond=0, tzinfo=None)
 
-    duration: timedelta = end_date - start_date
-
+    remote_url = "" if remote_url is None else remote_url + "\n"
     result_str: str = prefix + "\n"
-    result_str += "\n-----\n".join(map(lambda m: "SHA: " + m[0] + "\nMessage: " + m[1], msgs))
-    return result_str, start_date, max(duration.total_seconds() / 60,15)
+    previous_descriptions: str = ""
+    if existing_activity is not None:
+        previous_descriptions = existing_activity.description \
+            .replace(result_str, "") \
+            .replace(remote_url, "")
+        previous_descriptions += "\n-----\n"
+    result_str += remote_url
+    result_str += previous_descriptions
+    result_str += "\n-----\n".join(map(lambda m: "SHA: " + m[0] + "\nDate: " + str(m[2]) + "\nMessage: " + m[1], msgs))
+    return result_str, start_date

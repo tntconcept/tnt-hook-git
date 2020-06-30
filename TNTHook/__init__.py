@@ -19,7 +19,6 @@ def main(argv=None):
 
     parser.add_argument('--debug', action='store_true')
     parser.add_argument('--commit-msgs', help="Commit messages", required=True)
-    parser.add_argument('--prev-commit-date-str', help="Previous commit date", required=False)
     parser.add_argument('--remote', help="Remote repo URL", required=False)
     parser.add_argument('--config', help="Config file", required=False)
 
@@ -33,11 +32,11 @@ def main(argv=None):
             create_activity(config=Config.config(args.debug),
                             prj_config=prj_config,
                             commit_msgs=args.commit_msgs,
-                            prev_commit_date_str=args.prev_commit_date_str,
                             remote=args.remote)
         except Exception as error:
+            print("Could not register activity on TNT due to some errors:")
+            print(error)
+
             if not prj_config.ignore_errors:
-                raise error
-            else:
-                print("Could not register activity on TNT due to some errors:")
-                print(error)
+                exit(-1)
+

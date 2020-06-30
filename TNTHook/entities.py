@@ -29,6 +29,11 @@ class Activity:
     role: Role
 
 
+class ActivitiesResponse:
+    date: datetime
+    activities: [Activity]
+
+
 class CreateActivityRequest:
     id: int
     startDate: datetime
