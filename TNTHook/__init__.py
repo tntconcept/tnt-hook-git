@@ -26,11 +26,18 @@ def main(argv=None):
     args = parser.parse_args()
 
     config_file = args.config or os.getcwd() + "/.git/hooks/tnthookconfig.json"
+
     with open(config_file) as config_file:
         prj_config: PrjConfig = json.load(config_file, object_hook=lambda x: to_class(x, PrjConfig))
-
-        create_activity(config=Config.config(args.debug),
-                        prj_config=prj_config,
-                        commit_msgs=args.commit_msgs,
-                        prev_commit_date_str=args.prev_commit_date_str,
-                        remote=args.remote)
+        try:
+            create_activity(config=Config.config(args.debug),
+                            prj_config=prj_config,
+                            commit_msgs=args.commit_msgs,
+                            prev_commit_date_str=args.prev_commit_date_str,
+                            remote=args.remote)
+        except Exception as error:
+            if not prj_config.ignore_errors:
+                raise error
+            else:
+                print("Could not register activity on TNT due to some errors:")
+                print(error)

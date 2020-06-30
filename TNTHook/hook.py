@@ -42,6 +42,7 @@ class PrjConfig:
     role: str
     billable: bool = False
     activity_prefix: str = None
+    ignore_errors: bool = False
 
 
 def ask_credentials():
