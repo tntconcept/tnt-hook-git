@@ -42,9 +42,9 @@ if [ -n "$local_sha" ] && [ -n "$remote_sha" ]
 then
   if [ $((16#$remote_sha)) -eq 0 ]
   then
-    MSGS=`git log --pretty="format:%H;%s;%aI"`
+    MSGS=`git log --pretty="format:%H;%aI;%an <%ae>;%s"`
   else
-    MSGS=`git log --pretty="format:%H;%s;%aI" $remote_sha..$local_sha`
+    MSGS=`git log --pretty="format:%H;%aI;%an <%ae>;%s" $remote_sha..$local_sha`
   fi
   REMOTE=`git ls-remote --get-url | head -1`
 

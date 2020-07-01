@@ -139,13 +139,13 @@ def generate_info(commit_msgs: str,
                   remote_url: str = None) -> (str, datetime):
     prefix = PrjConfig.activity_prefix()
 
-    def msg_parser(msg: str) -> Tuple[str, str, str]:
+    def msg_parser(msg: str) -> Tuple[str, str, str, str]:
         items = msg.split(";")
         # return items[0], items[1], items[2]
-        return items[0], items[1], items[2]
+        return items[0], items[1], items[2], items[3]
 
     lines = commit_msgs.split("\n")[::-1]
-    msgs: [Tuple[str, str, datetime]] = list(map(msg_parser, lines))
+    msgs: [Tuple[str, str, datetime, str]] = list(map(msg_parser, lines))
 
     start_date: datetime = datetime.now().replace(hour=8, minute=0, second=0, microsecond=0, tzinfo=None)
 
@@ -159,5 +159,6 @@ def generate_info(commit_msgs: str,
         previous_descriptions += "\n-----\n"
     result_str += remote_url
     result_str += previous_descriptions
-    result_str += "\n-----\n".join(map(lambda m: "SHA: " + m[0] + "\nDate: " + str(m[2]) + "\nMessage: " + m[1], msgs))
+    result_str += "\n-----\n".join(map(lambda m: "\n".join(m), msgs))
+
     return result_str, start_date
