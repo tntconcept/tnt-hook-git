@@ -129,7 +129,9 @@ def create_activity(config: Config,
     json_str = json.dumps(new_activity.__dict__, cls=DateTimeEncoder)
     data = json.loads(json_str)
 
-    response: Response = requests.post(config.baseURL + "activities", headers=headers, json=data)
+    response: Response = requests.post(config.baseURL + "activities?autotruncate",
+                                       headers=headers,
+                                       json=data)
     if response.status_code == 200:
         print("Successfully created activity for " + project_name + " - " + role_name)
 
