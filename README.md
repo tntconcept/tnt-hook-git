@@ -55,7 +55,7 @@ And give it execution permission:
 ```bash
 chmod +x .git/hooks/pre-push
 ```
-Also create a file **.git/hooks/TNTGitHookconfig.json** to indicate to which proyect imputate. Example:
+Also create a file **.git/hooks/TNTGitHookConfig.json** to indicate to which project imputate. Example:
 ```json
 {
     "organization": "Some organization",

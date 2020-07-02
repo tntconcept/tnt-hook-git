@@ -17,6 +17,9 @@ from TNTGitHook.entities import *
 from TNTGitHook.exceptions import NoCredentialsError, AuthError, NotFoundError
 from TNTGitHook.utils import DateTimeEncoder, first, to_class
 
+NAME: str = "TNTGitHook"
+DEFAULT_CONFIG_FILE_PATH: str = f".git/hooks/{NAME}Config.json"
+
 
 class Config:
     baseURL: str
@@ -52,12 +55,12 @@ class PrjConfig:
 
 
 def ask_credentials():
-    keyring.set_password("com.autentia.TNTHook", "username", input("User: "))
-    keyring.set_password("com.autentia.TNTHook", "password", getpass())
+    keyring.set_password(f"com.autentia.{NAME}", "username", input("User: "))
+    keyring.set_password(f"com.autentia.{NAME}", "password", getpass())
 
 
 def setup(config: Config):
-    with pkg_resources.path('TNTGitHook', "misc") as context:
+    with pkg_resources.path(NAME, "misc") as context:
         script = (context / "pre-push.sh").read_text()
         try:
             path = ".git/hooks/pre-push"
@@ -71,7 +74,7 @@ def setup(config: Config):
             project = check_project_exists(config, headers, organization, input("Project: "))
             role = check_role_exists(config, headers, project, input("Role: "))
 
-            path = ".git/hooks/tnthookconfig.json"
+            path = DEFAULT_CONFIG_FILE_PATH
             prj_config = PrjConfig()
             prj_config.organization = organization.name
             prj_config.project = project.name
@@ -136,8 +139,8 @@ def create_activity(config: Config,
 
 
 def generate_request_headers(config):
-    username = keyring.get_password("com.autentia.TNTHook", "username")
-    password = keyring.get_password("com.autentia.TNTHook", "password")
+    username = keyring.get_password(f"com.autentia.{NAME}", "username")
+    password = keyring.get_password(f"com.autentia.{NAME}", "password")
     if not username or not password:
         raise NoCredentialsError()
     headers = {"Authorization": "Basic " + config.basic_auth}

@@ -2,12 +2,12 @@ import argparse
 import json
 import os
 
-from TNTGitHook.hook import create_activity, Config, ask_credentials, PrjConfig, setup
+from TNTGitHook.hook import create_activity, Config, ask_credentials, PrjConfig, setup, DEFAULT_CONFIG_FILE_PATH, NAME
 from TNTGitHook.utils import to_class
 
 
 def main(argv=None):
-    parser = argparse.ArgumentParser(description="TNTGitHook")
+    parser = argparse.ArgumentParser(description=f"{NAME}")
 
     parser.add_argument("--set-credentials", action='store_true')
     parser.add_argument("--setup", action='store_true')
@@ -30,7 +30,7 @@ def main(argv=None):
 
     args = parser.parse_args()
 
-    config_file = args.config or os.getcwd() + "/.git/hooks/tnthookconfig.json"
+    config_file = args.config or DEFAULT_CONFIG_FILE_PATH
 
     with open(config_file) as config_file:
         prj_config: PrjConfig = json.load(config_file, object_hook=lambda x: to_class(x, PrjConfig))
