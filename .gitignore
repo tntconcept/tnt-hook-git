@@ -2,5 +2,6 @@
 **/__pycache__/
 /dist/
 /build/
-/TNTHook.egg-info/
+/TNTGitHook.egg-info/
+/.idea/
 *.pyc

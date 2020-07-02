@@ -2,12 +2,12 @@ import argparse
 import json
 import os
 
-from TNTHook.hook import create_activity, Config, ask_credentials, PrjConfig
-from TNTHook.utils import to_class
+from TNTGitHook.hook import create_activity, Config, ask_credentials, PrjConfig
+from TNTGitHook.utils import to_class
 
 
 def main(argv=None):
-    parser = argparse.ArgumentParser(description="TNTHook")
+    parser = argparse.ArgumentParser(description="TNTGitHook")
 
     parser.add_argument("--set-credentials", action='store_true')
 

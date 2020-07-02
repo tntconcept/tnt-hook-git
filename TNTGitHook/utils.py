@@ -2,7 +2,7 @@ import json
 from datetime import datetime
 from typing import Any, Iterable, Callable, TypeVar
 
-from TNTHook.entities import Organization
+from TNTGitHook.entities import Organization
 
 
 class DateTimeEncoder(json.JSONEncoder):

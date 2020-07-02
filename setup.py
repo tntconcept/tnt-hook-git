@@ -4,8 +4,8 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="TNTHook",
-    version="0.0.8",
+    name="TNTGitHook",
+    version="0.1.0",
     author="Daniel Otero",
     author_email="dotero@autentia.com",
     description="Utility to auto imputate activities in TNT",
@@ -21,8 +21,8 @@ setuptools.setup(
     ],
     python_requires='>=3.6',
     install_requires=['requests', 'keyring'],
-    scripts=["bin/TNTHook"],
+    scripts=["bin/TNTGitHook"],
     package_data={
-        "TNTHook": ["misc/pre-push.sh"]
+        "TNTGitHook": ["misc/pre-push.sh"]
     }
 )

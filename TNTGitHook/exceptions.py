@@ -1,12 +1,12 @@
 
 class NoCredentialsError(Exception):
     def __str__(self):
-        return "No credentials supplied, use 'TNTHook --set-credentials' first"
+        return "No credentials supplied, use 'TNTGitHook --set-credentials' first"
 
 
 class AuthError(Exception):
     def __str__(self):
-        return "Invalid credentials, use 'TNTHook --set-credentials' to fix them"
+        return "Invalid credentials, use 'TNTGitHook --set-credentials' to fix them"
 
 
 class NotFoundError(Exception):

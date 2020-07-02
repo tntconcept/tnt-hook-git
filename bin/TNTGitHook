@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import TNTHook
+import TNTGitHook
 
 if __name__ == '__main__':
-    TNTHook.main()
+    TNTGitHook.main()

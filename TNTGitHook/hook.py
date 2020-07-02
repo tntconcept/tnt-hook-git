@@ -10,9 +10,9 @@ import keyring
 import requests
 from requests import Response
 
-from TNTHook.entities import *
-from TNTHook.exceptions import NoCredentialsError, AuthError, NotFoundError
-from TNTHook.utils import DateTimeEncoder, first, to_class
+from TNTGitHook.entities import *
+from TNTGitHook.exceptions import NoCredentialsError, AuthError, NotFoundError
+from TNTGitHook.utils import DateTimeEncoder, first, to_class
 
 
 class Config:

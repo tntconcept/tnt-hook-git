@@ -1,15 +1,5 @@
 # TNT Hook
 
-### Build release 
-To build Pypi package run
-```shell script
-python3 setup.py sdist bdist_wheel
-```
-To upload to nexus:
-```shell script
-python3 -m twine upload --repository-url https://autentia.no-ip.org/nexus/repository/autentia-pypi/ dist/*
-```
-
 ### Install
 Requirements:
 - Python 3.7
@@ -26,9 +16,9 @@ extra-index-url=https://autentia.no-ip.org/nexus/repository/autentia-pypi/simple
 trusted-host = autentia.no-ip.org
 ```
 
-To install or upgrade the TNTHook utility run the following command:
+To install or upgrade the TNTGitHook utility run the following command:
 ```shell script
-pip3 install --upgrade TNTHook
+pip3 install --upgrade TNTGitHook
 ```
 
 ### Usage
@@ -48,15 +38,15 @@ then
   fi
   REMOTE=`git ls-remote --get-url | head -1`
 
-  # Assumes TNTHook is on PATH
-  TNTHook --commit-msgs "$MSGS" --remote $REMOTE
+  # Assumes TNTGitHook is on PATH
+  TNTGitHook --commit-msgs "$MSGS" --remote $REMOTE
 fi
 ```
 And give it execution permission:
 ```bash
 chmod +x .git/hooks/pre-push
 ```
-Also create a file **.git/hooks/tnthookconfig.json** to indicate to which proyect imputate. Example:
+Also create a file **.git/hooks/TNTGitHookconfig.json** to indicate to which proyect imputate. Example:
 ```json
 {
     "organization": "Some organization",
@@ -66,6 +56,16 @@ Also create a file **.git/hooks/tnthookconfig.json** to indicate to which proyec
 ```
 Once everything is set up, in order to set TNT login credentials, use the following command:
 ```shell script
-TNTHook --set-credentials
+TNTGitHook --set-credentials
 ```
 Credentials will be secured using system APIs, keychain in macOS, several options on linux depending on desktop, and whatever security windows may have. Check https://pypi.org/project/keyring/ for more detail
+
+### Build release 
+To build Pypi, modify setup.py accordingly (versions, name, etc) package run
+```shell script
+python3 setup.py sdist bdist_wheel
+```
+To upload to nexus:
+```shell script
+python3 -m twine upload --repository-url https://autentia.no-ip.org/nexus/repository/autentia-pypi/ dist/*
+```
