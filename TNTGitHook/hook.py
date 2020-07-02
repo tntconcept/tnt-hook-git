@@ -158,6 +158,7 @@ def generate_request_headers(config):
 def check_role_exists(config, headers, project, role_name):
     response: Response = requests.get(config.baseURL + "projects/" + str(project.id) + "/roles",
                                       headers=headers)
+    response.encoding = 'utf-8'
     roles: List[Role] = json.loads(response.text, object_hook=lambda x: to_class(x, cls=Role))
     role = first(lambda r: r.name == role_name, roles)
     if not role:
@@ -168,6 +169,7 @@ def check_role_exists(config, headers, project, role_name):
 def check_project_exists(config, headers, organization, project_name):
     response: Response = requests.get(config.baseURL + "organizations/" + str(organization.id) + "/projects",
                                       headers=headers)
+    response.encoding = 'utf-8'
     projects: List[Project] = json.loads(response.text, object_hook=lambda x: to_class(x, cls=Project))
     project = first(lambda p: p.name == project_name, projects)
     if not project:
@@ -177,6 +179,7 @@ def check_project_exists(config, headers, organization, project_name):
 
 def check_organization_exists(config, headers, organization_name):
     response: Response = requests.get(config.baseURL + "organizations", headers=headers)
+    response.encoding = 'utf-8'
     organizations: List[Organization] = json.loads(response.text, object_hook=lambda x: to_class(x, cls=Organization))
     organization = first(lambda o: o.name == organization_name, organizations)
     if not organization:
