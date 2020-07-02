@@ -22,7 +22,16 @@ pip3 install --upgrade TNTGitHook
 ```
 
 ### Usage
-Once utility is installed, in order to auto imputate on each git push, create the following script on <your-git-project>/.git/hooks/pre-push
+Once utility is installed, in order to auto imputate on each git push, you must setup the tool by using this command on the root of your git repository.
+```shell script
+TNTGitHook --setup
+```
+It will prompt you for the organization, project and role names (they must match exactly with the ones on TNT, otherwise tool will complain)
+
+#### Manual Setup
+Notice: This is what _TNTGitHook --setup_ does under the hood, so you can skip this section.
+
+Create the following script on <your-git-project>/.git/hooks/pre-push
 ```shell script
 #!/bin/bash
 
@@ -54,6 +63,8 @@ Also create a file **.git/hooks/TNTGitHookconfig.json** to indicate to which pro
     "role": "Role",
 }
 ```
+
+#### Credentials
 Once everything is set up, in order to set TNT login credentials, use the following command:
 ```shell script
 TNTGitHook --set-credentials

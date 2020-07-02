@@ -11,7 +11,7 @@ setuptools.setup(
     description="Utility to auto imputate activities in TNT",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://gitlab.com/tntutils/TNTHook-Python.git",
+    url="https://gitlab.com/autentia/internal/TNTGitHook.git",
     packages=setuptools.find_packages(),
     license='Unlicense',
     classifiers=[

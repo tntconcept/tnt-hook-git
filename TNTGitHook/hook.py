@@ -35,7 +35,6 @@ class Config:
                           authURL="http://localhost:8080/oauth/token",
                           basic_auth="dG50LWNsaWVudDpob2xh")
         else:
-            # TODO: Change this
             return Config(baseURL="https://autentia.no-ip.org/tntconcept-api-rest-kotlin/api/",
                           authURL="https://autentia.no-ip.org/tntconcept-api-rest-kotlin/oauth/token",
                           basic_auth="dG50LWNsaWVudDpDbGllbnQtVE5ULXYx")
@@ -68,9 +67,9 @@ def setup(config: Config):
                 os.chmod(path, st.st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
 
             headers = generate_request_headers(config)
-            organization = assert_organization_exists(config, headers, input("Organization: "))
-            project = assert_project_exists(config, headers, organization, input("Project: "))
-            role = assert_role_exists(config, headers, project, input("Role: "))
+            organization = check_organization_exists(config, headers, input("Organization: "))
+            project = check_project_exists(config, headers, organization, input("Project: "))
+            role = check_role_exists(config, headers, project, input("Role: "))
 
             path = ".git/hooks/tnthookconfig.json"
             prj_config = PrjConfig()
@@ -97,11 +96,11 @@ def create_activity(config: Config,
 
     headers = generate_request_headers(config)
 
-    organization = assert_organization_exists(config, headers, organization_name)
+    organization = check_organization_exists(config, headers, organization_name)
 
-    project = assert_project_exists(config, headers, organization, project_name)
+    project = check_project_exists(config, headers, organization, project_name)
 
-    role = assert_role_exists(config, headers, project, role_name)
+    role = check_role_exists(config, headers, project, role_name)
 
     now = datetime.now()
     now = now.strftime("%Y-%m-%d")
@@ -153,7 +152,7 @@ def generate_request_headers(config):
     return headers
 
 
-def assert_role_exists(config, headers, project, role_name):
+def check_role_exists(config, headers, project, role_name):
     response: Response = requests.get(config.baseURL + "projects/" + str(project.id) + "/roles",
                                       headers=headers)
     roles: List[Role] = json.loads(response.text, object_hook=lambda x: to_class(x, cls=Role))
@@ -163,7 +162,7 @@ def assert_role_exists(config, headers, project, role_name):
     return role
 
 
-def assert_project_exists(config, headers, organization, project_name):
+def check_project_exists(config, headers, organization, project_name):
     response: Response = requests.get(config.baseURL + "organizations/" + str(organization.id) + "/projects",
                                       headers=headers)
     projects: List[Project] = json.loads(response.text, object_hook=lambda x: to_class(x, cls=Project))
@@ -173,7 +172,7 @@ def assert_project_exists(config, headers, organization, project_name):
     return project
 
 
-def assert_organization_exists(config, headers, organization_name):
+def check_organization_exists(config, headers, organization_name):
     response: Response = requests.get(config.baseURL + "organizations", headers=headers)
     organizations: List[Organization] = json.loads(response.text, object_hook=lambda x: to_class(x, cls=Organization))
     organization = first(lambda o: o.name == organization_name, organizations)
