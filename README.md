@@ -60,7 +60,7 @@ Also create a file **.git/hooks/TNTGitHookConfig.json** to indicate to which pro
 {
     "organization": "Some organization",
     "project": "Project",
-    "role": "Role",
+    "role": "Role"
 }
 ```
 
