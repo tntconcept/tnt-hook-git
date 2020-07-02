@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 from datetime import timedelta, datetime
 from functools import reduce
 from getpass import getpass
@@ -9,6 +10,8 @@ from typing import List, Tuple
 import keyring
 import requests
 from requests import Response
+import stat
+import importlib.resources as pkg_resources
 
 from TNTGitHook.entities import *
 from TNTGitHook.exceptions import NoCredentialsError, AuthError, NotFoundError
@@ -54,6 +57,35 @@ def ask_credentials():
     keyring.set_password("com.autentia.TNTHook", "password", getpass())
 
 
+def setup(config: Config):
+    with pkg_resources.path('TNTGitHook', "misc") as context:
+        script = (context / "pre-push.sh").read_text()
+        try:
+            path = ".git/hooks/pre-push"
+            with open(path, "w") as f:
+                f.write(script)
+                st = os.stat(path)
+                os.chmod(path, st.st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
+
+            headers = generate_request_headers(config)
+            organization = assert_organization_exists(config, headers, input("Organization: "))
+            project = assert_project_exists(config, headers, organization, input("Project: "))
+            role = assert_role_exists(config, headers, project, input("Role: "))
+
+            path = ".git/hooks/tnthookconfig.json"
+            prj_config = PrjConfig()
+            prj_config.organization = organization.name
+            prj_config.project = project.name
+            prj_config.role = role.name
+
+            with open(path, "w") as f:
+                f.write(json.dumps(prj_config.__dict__, sort_keys=True, indent=4))
+        except FileNotFoundError:
+            print("Unable to setup hook. Is this a git repository?")
+        except Exception as ex:
+            print(ex)
+
+
 def create_activity(config: Config,
                     prj_config: PrjConfig,
                     commit_msgs: str,
@@ -63,45 +95,13 @@ def create_activity(config: Config,
     role_name = prj_config.role
     billable = False
 
-    username = keyring.get_password("com.autentia.TNTHook", "username")
-    password = keyring.get_password("com.autentia.TNTHook", "password")
+    headers = generate_request_headers(config)
 
-    if not username or not password:
-        raise NoCredentialsError()
+    organization = assert_organization_exists(config, headers, organization_name)
 
-    headers = {"Authorization": "Basic " + config.basic_auth}
-    payload = {"grant_type": "password",
-               "username": username,
-               "password": password}
-    token_response = requests.post(config.authURL, headers=headers, data=payload)
-    if token_response.status_code != 200:
-        raise AuthError()
-    access_token = token_response.json()["access_token"]
+    project = assert_project_exists(config, headers, organization, project_name)
 
-    headers = {"Authorization": "Bearer " + access_token}
-
-    response: Response = requests.get(config.baseURL + "organizations", headers=headers)
-    organizations: List[Organization] = json.loads(response.text, object_hook=lambda x: to_class(x, cls=Organization))
-
-    organization = first(lambda o: o.name == organization_name, organizations)
-    if not organization:
-        raise NotFoundError("Organization", organization_name)
-
-    response: Response = requests.get(config.baseURL + "organizations/" + str(organization.id) + "/projects",
-                                      headers=headers)
-    projects: List[Project] = json.loads(response.text, object_hook=lambda x: to_class(x, cls=Project))
-    project = first(lambda p: p.name == project_name, projects)
-
-    if not project:
-        raise NotFoundError("Project", project_name)
-
-    response: Response = requests.get(config.baseURL + "projects/" + str(project.id) + "/roles",
-                                      headers=headers)
-    roles: List[Role] = json.loads(response.text, object_hook=lambda x: to_class(x, cls=Role))
-    role = first(lambda r: r.name == role_name, roles)
-
-    if not role:
-        raise NotFoundError("Role", role_name)
+    role = assert_role_exists(config, headers, project, role_name)
 
     now = datetime.now()
     now = now.strftime("%Y-%m-%d")
@@ -134,6 +134,52 @@ def create_activity(config: Config,
                                        json=data)
     if response.status_code == 200:
         print("Successfully created activity for " + project_name + " - " + role_name)
+
+
+def generate_request_headers(config):
+    username = keyring.get_password("com.autentia.TNTHook", "username")
+    password = keyring.get_password("com.autentia.TNTHook", "password")
+    if not username or not password:
+        raise NoCredentialsError()
+    headers = {"Authorization": "Basic " + config.basic_auth}
+    payload = {"grant_type": "password",
+               "username": username,
+               "password": password}
+    token_response = requests.post(config.authURL, headers=headers, data=payload)
+    if token_response.status_code != 200:
+        raise AuthError()
+    access_token = token_response.json()["access_token"]
+    headers = {"Authorization": "Bearer " + access_token}
+    return headers
+
+
+def assert_role_exists(config, headers, project, role_name):
+    response: Response = requests.get(config.baseURL + "projects/" + str(project.id) + "/roles",
+                                      headers=headers)
+    roles: List[Role] = json.loads(response.text, object_hook=lambda x: to_class(x, cls=Role))
+    role = first(lambda r: r.name == role_name, roles)
+    if not role:
+        raise NotFoundError("Role", role_name)
+    return role
+
+
+def assert_project_exists(config, headers, organization, project_name):
+    response: Response = requests.get(config.baseURL + "organizations/" + str(organization.id) + "/projects",
+                                      headers=headers)
+    projects: List[Project] = json.loads(response.text, object_hook=lambda x: to_class(x, cls=Project))
+    project = first(lambda p: p.name == project_name, projects)
+    if not project:
+        raise NotFoundError("Project", project_name)
+    return project
+
+
+def assert_organization_exists(config, headers, organization_name):
+    response: Response = requests.get(config.baseURL + "organizations", headers=headers)
+    organizations: List[Organization] = json.loads(response.text, object_hook=lambda x: to_class(x, cls=Organization))
+    organization = first(lambda o: o.name == organization_name, organizations)
+    if not organization:
+        raise NotFoundError("Organization", organization_name)
+    return organization
 
 
 def generate_info(commit_msgs: str,
