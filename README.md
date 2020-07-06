@@ -21,8 +21,8 @@ Autentia private Nexus Pypi (package repository) must be added. Edit (or create 
 [global]
 index = https://pypi.python.org/pypi/
 index-url = https://pypi.python.org/simple/
-extra-index-url = https://autentia.no-ip.org/nexus/repository/autentia-pypi/simple/
-trusted-host = autentia.no-ip.org
+extra-index-url = https://tnt.autentia.com/nexus/repository/autentia-pypi/simple/
+trusted-host = tnt.autentia.com
 ```
 
 To install or upgrade the TNTGitHook utility run the following command:
@@ -110,5 +110,5 @@ python3 setup.py sdist bdist_wheel
 To upload to nexus:
 
 ```shell script
-python3 -m twine upload --repository-url https://autentia.no-ip.org/nexus/repository/autentia-pypi/ dist/*
+python3 -m twine upload --repository-url https://tnt.autentia.com/nexus/repository/autentia-pypi/ dist/*
 ```
