@@ -27,7 +27,7 @@ trusted-host = tnt.autentia.com
 
 To install or upgrade the TNTGitHook utility run the following command:
 
-```shell script
+```bash
 pip3 install --upgrade TNTGitHook
 ```
 
@@ -36,7 +36,7 @@ pip3 install --upgrade TNTGitHook
 
 Once everything is installed, in order to set TNT login credentials, use the following command:
 
-```shell script
+```bash
 TNTGitHook --set-credentials
 ```
 
@@ -49,7 +49,7 @@ Once utility is installed, in order to auto imputate on each git push, you must 
 
 **This configuration is per git repository!**
 
-```shell script
+```bash
 TNTGitHook --setup
 ```
 
@@ -62,7 +62,7 @@ It will prompt you for the organization, project and role names (they must match
 
 Create the following script on `<your-git-project>/.git/hooks/pre-push`
 
-```shell script
+```bash
 #!/bin/bash
 
 read local_ref local_sha remote_ref remote_sha
@@ -103,12 +103,12 @@ Also create a file **.git/hooks/TNTGitHookConfig.json** to indicate to which pro
 
 To build Pypi, modify setup.py accordingly (versions, name, etc) package run
 
-```shell script
+```bash
 python3 setup.py sdist bdist_wheel
 ```
 
 To upload to nexus:
 
-```shell script
+```bash
 python3 -m twine upload --repository-url https://tnt.autentia.com/nexus/repository/autentia-pypi/ dist/*
 ```
