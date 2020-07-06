@@ -60,7 +60,7 @@ It will prompt you for the organization, project and role names (they must match
 
 **Notice: This is what _TNTGitHook --setup_ does under the hood, so you can skip this section.**
 
-Create the following script on <your-git-project>/.git/hooks/pre-push
+Create the following script on `<your-git-project>/.git/hooks/pre-push`
 
 ```shell script
 #!/bin/bash
