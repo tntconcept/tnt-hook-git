@@ -38,8 +38,8 @@ class Config:
                           authURL="http://localhost:8080/oauth/token",
                           basic_auth="dG50LWNsaWVudDpob2xh")
         else:
-            return Config(baseURL="https://autentia.no-ip.org/tntconcept-api-rest-kotlin/api/",
-                          authURL="https://autentia.no-ip.org/tntconcept-api-rest-kotlin/oauth/token",
+            return Config(baseURL="https://tnt.autentia.com/tntconcept-api-rest-kotlin/api/",
+                          authURL="https://tnt.autentia.com/tntconcept-api-rest-kotlin/oauth/token",
                           basic_auth="dG50LWNsaWVudDpDbGllbnQtVE5ULXYx")
 
 
