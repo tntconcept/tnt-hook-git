@@ -2,7 +2,7 @@
 
 read local_ref local_sha remote_ref remote_sha
 
-if [ -n "$local_sha" ] && [ -n "$remote_sha" ]
+if [ -n "$local_sha" ] && [ -n "$remote_sha" ] && [ $((16#$local_sha)) -ne 0 ]
 then
   if [ $((16#$remote_sha)) -eq 0 ]
   then
