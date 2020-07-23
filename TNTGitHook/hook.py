@@ -25,6 +25,7 @@ class Config:
     baseURL: str
     authURL: str
     basic_auth: str
+    timeout: int = 5
 
     def __init__(self, baseURL: str, authURL: str, basic_auth: str):
         self.baseURL = baseURL
@@ -48,6 +49,7 @@ class PrjConfig:
     project: str
     role: str
     ignore_errors: bool = False
+    timeout: int = 5
 
     @staticmethod
     def activity_prefix() -> str:
@@ -110,7 +112,7 @@ def create_activity(config: Config,
     response: Response = requests.get(config.baseURL + "activities/",
                                       params={"startDate": str(now), "endDate": str(now)},
                                       headers=headers,
-                                      timeout=5)
+                                      timeout=config.timeout)
     activities_response: List[ActivitiesResponse]
     activities_response = json.loads(response.text, object_hook=lambda x: to_class(x, cls=ActivitiesResponse))
     activities = reduce(lambda r, a: r + a.activities, activities_response, [])
@@ -135,7 +137,7 @@ def create_activity(config: Config,
     response: Response = requests.post(config.baseURL + "activities?autotruncate",
                                        headers=headers,
                                        json=data,
-                                       timeout=5)
+                                       timeout=config.timeout)
     if response.status_code == 200:
         print("Successfully created activity for " + project_name + " - " + role_name)
 
@@ -149,7 +151,7 @@ def generate_request_headers(config):
     payload = {"grant_type": "password",
                "username": username,
                "password": password}
-    token_response = requests.post(config.authURL, headers=headers, data=payload, timeout=5)
+    token_response = requests.post(config.authURL, headers=headers, data=payload, timeout=config.timeout)
     if token_response.status_code != 200:
         raise AuthError()
     access_token = token_response.json()["access_token"]
@@ -159,7 +161,7 @@ def generate_request_headers(config):
 
 def check_role_exists(config, headers, project, role_name):
     response: Response = requests.get(config.baseURL + "projects/" + str(project.id) + "/roles",
-                                      headers=headers, timeout=5)
+                                      headers=headers, timeout=config.timeout)
     response.encoding = 'utf-8'
     roles: List[Role] = json.loads(response.text, object_hook=lambda x: to_class(x, cls=Role))
     role = first(lambda r: r.name == role_name, roles)
@@ -170,7 +172,7 @@ def check_role_exists(config, headers, project, role_name):
 
 def check_project_exists(config, headers, organization, project_name):
     response: Response = requests.get(config.baseURL + "organizations/" + str(organization.id) + "/projects",
-                                      headers=headers, timeout=5)
+                                      headers=headers, timeout=config.timeout)
     response.encoding = 'utf-8'
     projects: List[Project] = json.loads(response.text, object_hook=lambda x: to_class(x, cls=Project))
     project = first(lambda p: p.name == project_name, projects)
@@ -180,7 +182,7 @@ def check_project_exists(config, headers, organization, project_name):
 
 
 def check_organization_exists(config, headers, organization_name):
-    response: Response = requests.get(config.baseURL + "organizations", headers=headers, timeout=5)
+    response: Response = requests.get(config.baseURL + "organizations", headers=headers, timeout=config.timeout)
     response.encoding = 'utf-8'
     organizations: List[Organization] = json.loads(response.text, object_hook=lambda x: to_class(x, cls=Organization))
     organization = first(lambda o: o.name == organization_name, organizations)

@@ -34,6 +34,7 @@ def main(argv=None):
 
     with open(config_file) as config_file:
         prj_config: PrjConfig = json.load(config_file, object_hook=lambda x: to_class(x, PrjConfig))
+        config.timeout = prj_config.timeout
         try:
             create_activity(config=config,
                             prj_config=prj_config,
