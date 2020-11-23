@@ -90,6 +90,11 @@ def setup(config: Config):
             print(ex)
 
 
+def read_commit_msgs(file: str):
+    with open(file) as f:
+        return f.read().strip()
+
+
 def create_activity(config: Config,
                     prj_config: PrjConfig,
                     commit_msgs: str,

@@ -12,6 +12,8 @@ then
   fi
   CMD="$CMD 2> /dev/null"
   MSGS=`eval $CMD`
+  FILENAME="/tmp/tnt-git-hook-commits-$(date +%s)"
+  eval $CMD > $FILENAME
 
   # Do nothing on error, just inform and go ahead with "git push" (i.e. conflicts)
   if [ $? -ne 0 ]
@@ -23,6 +25,7 @@ then
   REMOTE=`git ls-remote --get-url | head -1`
 
   # Assumes TNTGitHook is on PATH
-  TNTGitHook --commit-msgs "$MSGS" --remote $REMOTE
+  TNTGitHook --commit-msgs-file $FILENAME --remote $REMOTE
+  rm $FILENAME
 fi
 
