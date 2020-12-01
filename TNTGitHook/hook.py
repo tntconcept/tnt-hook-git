@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import pkgutil
 from datetime import timedelta, datetime
 from functools import reduce
 from getpass import getpass
@@ -62,32 +63,31 @@ def ask_credentials():
 
 
 def setup(config: Config):
-    with pkg_resources.path(NAME, "misc") as context:
-        script = (context / "pre-push.sh").read_text()
-        try:
-            path = ".git/hooks/pre-push"
-            with open(path, "w") as f:
-                f.write(script)
-                st = os.stat(path)
-                os.chmod(path, st.st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
+    script = pkgutil.get_data('TNTGitHook', 'misc/pre-push.sh').decode('utf8')
+    try:
+        path = ".git/hooks/pre-push"
+        with open(path, "w") as f:
+            f.write(script)
+            st = os.stat(path)
+            os.chmod(path, st.st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
 
-            headers = generate_request_headers(config)
-            organization = check_organization_exists(config, headers, input("Organization: "))
-            project = check_project_exists(config, headers, organization, input("Project: "))
-            role = check_role_exists(config, headers, project, input("Role: "))
+        headers = generate_request_headers(config)
+        organization = check_organization_exists(config, headers, input("Organization: "))
+        project = check_project_exists(config, headers, organization, input("Project: "))
+        role = check_role_exists(config, headers, project, input("Role: "))
 
-            path = DEFAULT_CONFIG_FILE_PATH
-            prj_config = PrjConfig()
-            prj_config.organization = organization.name
-            prj_config.project = project.name
-            prj_config.role = role.name
+        path = DEFAULT_CONFIG_FILE_PATH
+        prj_config = PrjConfig()
+        prj_config.organization = organization.name
+        prj_config.project = project.name
+        prj_config.role = role.name
 
-            with open(path, "w") as f:
-                f.write(json.dumps(prj_config.__dict__, sort_keys=True, indent=4))
-        except FileNotFoundError:
-            print("Unable to setup hook. Is this a git repository?")
-        except Exception as ex:
-            print(ex)
+        with open(path, "w") as f:
+            f.write(json.dumps(prj_config.__dict__, sort_keys=True, indent=4))
+    except FileNotFoundError:
+        print("Unable to setup hook. Is this a git repository?")
+    except Exception as ex:
+        print(ex)
 
 
 def read_commit_msgs(file: str):
