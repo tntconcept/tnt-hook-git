@@ -121,7 +121,7 @@ def create_activity(config: Config,
     activities_response: List[ActivitiesResponse]
     activities_response = json.loads(response.text, object_hook=lambda x: to_class(x, cls=ActivitiesResponse))
     activities = reduce(lambda r, a: r + a.activities, activities_response, [])
-    existing_activity = first(lambda a: PrjConfig.activity_prefix() in a.description, activities)
+    existing_activity = first(lambda a: find_autocreated_activity(a.description, remote), activities)
 
     info: (str, datetime, int) = generate_info(commit_msgs,
                                                existing_activity,
@@ -145,6 +145,15 @@ def create_activity(config: Config,
                                        timeout=config.timeout)
     if response.status_code == 200:
         print("Successfully created activity for " + project_name + " - " + role_name)
+
+
+def find_autocreated_activity(description: str, remote: str):
+    prefix = PrjConfig.activity_prefix()
+    result = prefix in description
+    description = description.replace(prefix + "\n", "")
+    if remote:
+        result = result and remote in description.split("\n")[0]
+    return result
 
 
 def generate_request_headers(config):
