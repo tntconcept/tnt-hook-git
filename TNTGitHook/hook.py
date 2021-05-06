@@ -218,7 +218,7 @@ def generate_info(commit_msgs: str,
     lines = commit_msgs.split("\n")[::-1]
     msgs: [Tuple[str, str, datetime, str]] = list(map(msg_parser, lines))
 
-    start_date: datetime = datetime.now().replace(hour=8, minute=0, second=0, microsecond=0, tzinfo=None)
+    start_date: datetime = datetime.now().replace(hour=5, minute=0, second=0, microsecond=0, tzinfo=None)
 
     remote_url = "" if remote_url is None else remote_url + "\n"
     result_str: str = prefix + "\n"
