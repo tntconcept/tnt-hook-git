@@ -85,7 +85,7 @@ def setup(config: Config):
         with open(path, "w") as f:
             f.write(json.dumps(prj_config.__dict__, sort_keys=True, indent=4))
     except FileNotFoundError:
-        print("Unable to setup hook. Is this a git repository?")
+        print("Unable to setup hook. Is this a git repository?\nMaybe you're not at the root folder.")
     except Exception as ex:
         print(ex)
 
