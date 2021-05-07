@@ -18,6 +18,8 @@ from TNTGitHook.utils import DateTimeEncoder, first, to_class
 
 NAME: str = "TNTGitHook"
 DEFAULT_CONFIG_FILE_PATH: str = f".git/hooks/{NAME}Config.json"
+# In fact is 2048, but as we are going to substitute the last characters for \n... we need 5 empty at the end
+TNT_DESCRIPTION_MAX_SIZE = 2043
 
 
 class Config:
@@ -210,7 +212,6 @@ def generate_info(commit_msgs: str,
 
     def msg_parser(msg: str) -> Tuple[str, str, str, str]:
         items = msg.split(";")
-        # return items[0], items[1], items[2]
         return items[0], items[1], items[2], items[3]
 
     lines = commit_msgs.split("\n")[::-1]
@@ -229,5 +230,8 @@ def generate_info(commit_msgs: str,
     result_str += remote_url
     result_str += previous_descriptions
     result_str += "\n-----\n".join(map(lambda m: "\n".join(m), msgs))
+
+    # Truncate description gracefully if description buffer overflows
+    result_str = (result_str[:TNT_DESCRIPTION_MAX_SIZE] + '\n...') if len(result_str) > TNT_DESCRIPTION_MAX_SIZE else result_str
 
     return result_str, start_date
