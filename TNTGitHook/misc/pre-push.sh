@@ -9,6 +9,11 @@ then
   if [ $((16#$remote_sha)) -ne 0 ]
   then
     CMD="$CMD $remote_sha..$local_sha"
+  else
+# Remote being created or deleted. For complete information view: https://www.git-scm.com/docs/githooks#_pre_push
+# When retrieving the commit with sha as above the order is altered, so we need to reverse it.
+# We are retrieving the complete commit list, so in order to avoid TNT activity description overflow we will limit the number retrieved
+    CMD="$CMD --reverse"
   fi
   CMD="$CMD 2> /dev/null"
   FILENAME="/tmp/tnt-git-hook-commits-$(date +%s)"
