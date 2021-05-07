@@ -107,7 +107,7 @@ To build Pypi, modify setup.py accordingly (versions, name, etc) package run
 python3 setup.py sdist bdist_wheel
 ```
 
-To upload to nexus:
+To upload to Nexus (you'll need to have twine installed: `pip3 install twine`):
 
 ```bash
 python3 -m twine upload --repository-url https://tnt.autentia.com/nexus/repository/autentia-pypi/ dist/*
