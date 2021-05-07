@@ -21,7 +21,7 @@ then
     exit 0
   fi
 
-  REMOTE=`git ls-remote --get-url | head -1`
+  REMOTE=$(git ls-remote --get-url | head -1)
 
   # Assumes TNTGitHook is on PATH
   TNTGitHook --commit-msgs-file $FILENAME --remote $REMOTE
