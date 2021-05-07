@@ -11,7 +11,6 @@ then
     CMD="$CMD $remote_sha..$local_sha"
   fi
   CMD="$CMD 2> /dev/null"
-  MSGS=`eval $CMD`
   FILENAME="/tmp/tnt-git-hook-commits-$(date +%s)"
   eval $CMD > $FILENAME
 
