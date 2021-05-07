@@ -17,7 +17,7 @@ then
   # Do nothing on error, just inform and go ahead with "git push" (i.e. conflicts)
   if [ $? -ne 0 ]
   then
-    echo "Unable to retrieve git log information, will not create evidence on TNT"
+    echo "Unable to retrieve git log information, will not create evidence on TNT but push continues"
     exit 0
   fi
 
