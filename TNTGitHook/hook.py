@@ -3,7 +3,6 @@ from __future__ import annotations
 import json
 import os
 import pkgutil
-from datetime import timedelta, datetime
 from functools import reduce
 from getpass import getpass
 from typing import List, Tuple
@@ -12,7 +11,6 @@ import keyring
 import requests
 from requests import Response
 import stat
-import importlib.resources as pkg_resources
 
 from TNTGitHook.entities import *
 from TNTGitHook.exceptions import NoCredentialsError, AuthError, NotFoundError
