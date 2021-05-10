@@ -11,9 +11,8 @@ then
     CMD="$CMD $remote_sha..$local_sha"
   else
 # Remote being created or deleted. For complete information view: https://www.git-scm.com/docs/githooks#_pre_push
-# When retrieving the commit with sha as above the order is altered, so we need to reverse it.
-# We are retrieving the complete commit list, so in order to avoid TNT activity description overflow we will limit the number retrieved
-    CMD="$CMD --reverse"
+# We are going to retrieve the commits only accessible from the current branch (local_ref)
+    CMD="$CMD $local_ref --not $(git for-each-ref --format='%(refname)' refs/heads/ | grep -v "refs/heads/$local_ref")"
   fi
   CMD="$CMD 2> /dev/null"
   FILENAME="/tmp/tnt-git-hook-commits-$(date +%s)"
