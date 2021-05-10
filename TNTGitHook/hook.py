@@ -3,16 +3,15 @@ from __future__ import annotations
 import json
 import os
 import pkgutil
-from datetime import timedelta, datetime
 from functools import reduce
 from getpass import getpass
 from typing import List, Tuple
 
 import keyring
 import requests
+from keyring.errors import PasswordDeleteError
 from requests import Response
 import stat
-import importlib.resources as pkg_resources
 
 from TNTGitHook.entities import *
 from TNTGitHook.exceptions import NoCredentialsError, AuthError, NotFoundError
@@ -20,6 +19,8 @@ from TNTGitHook.utils import DateTimeEncoder, first, to_class
 
 NAME: str = "TNTGitHook"
 DEFAULT_CONFIG_FILE_PATH: str = f".git/hooks/{NAME}Config.json"
+# In fact is 2048, but as we are going to substitute the last characters for \n... we need 5 empty at the end
+TNT_DESCRIPTION_MAX_SIZE = 2043
 
 
 class Config:
@@ -58,8 +59,17 @@ class PrjConfig:
 
 
 def ask_credentials():
-    keyring.set_password(f"com.autentia.{NAME}", "username", input("User: "))
-    keyring.set_password(f"com.autentia.{NAME}", "password", getpass())
+    # Store the user as single value in keychain to avoid multiple ask for password
+    username = input("User: ")
+    password = getpass()
+    keyring.set_password(f"com.autentia.{NAME}", "credentials", f"{username}:{password}")
+    # TODO: remove code below when every user has migrated
+    try:
+        keyring.delete_password(f"com.autentia.{NAME}", "username")
+        keyring.delete_password(f"com.autentia.{NAME}", "password")
+    except PasswordDeleteError:
+        # We have already deleted old values, no true error so we can continue
+        pass
 
 
 def setup(config: Config):
@@ -85,7 +95,7 @@ def setup(config: Config):
         with open(path, "w") as f:
             f.write(json.dumps(prj_config.__dict__, sort_keys=True, indent=4))
     except FileNotFoundError:
-        print("Unable to setup hook. Is this a git repository?")
+        print("Unable to setup hook. Is this a git repository?\nMaybe you're not at the root folder.")
     except Exception as ex:
         print(ex)
 
@@ -157,10 +167,7 @@ def find_autocreated_activity(description: str, remote: str):
 
 
 def generate_request_headers(config):
-    username = keyring.get_password(f"com.autentia.{NAME}", "username")
-    password = keyring.get_password(f"com.autentia.{NAME}", "password")
-    if not username or not password:
-        raise NoCredentialsError()
+    username, password = retrieve_keychain_credentials()
     headers = {"Authorization": "Basic " + config.basic_auth}
     payload = {"grant_type": "password",
                "username": username,
@@ -171,6 +178,28 @@ def generate_request_headers(config):
     access_token = token_response.json()["access_token"]
     headers = {"Authorization": "Bearer " + access_token}
     return headers
+
+
+def retrieve_keychain_credentials():
+    credentials = keyring.get_password(f"com.autentia.{NAME}", "credentials")
+    # TODO: backwards compatibility. Leave only else code when all users migrated to new credentials management
+    if not credentials:
+        username = keyring.get_password(f"com.autentia.{NAME}", "username")
+        password = keyring.get_password(f"com.autentia.{NAME}", "password")
+    else:
+        tokens = credentials.split(sep=":", maxsplit=2)
+        username = tokens[0]
+        password = tokens[1]
+        keyring.set_password(f"com.autentia.{NAME}", "credentials", f"{username}:{password}")
+        try:
+            keyring.delete_password(f"com.autentia.{NAME}", "username")
+            keyring.delete_password(f"com.autentia.{NAME}", "password")
+        except PasswordDeleteError:
+            # We have already deleted old values, no true error so we can continue
+            pass
+    if not username or not password:
+        raise NoCredentialsError()
+    return username, password
 
 
 def check_role_exists(config, headers, project, role_name):
@@ -212,7 +241,6 @@ def generate_info(commit_msgs: str,
 
     def msg_parser(msg: str) -> Tuple[str, str, str, str]:
         items = msg.split(";")
-        # return items[0], items[1], items[2]
         return items[0], items[1], items[2], items[3]
 
     lines = commit_msgs.split("\n")[::-1]
@@ -231,5 +259,8 @@ def generate_info(commit_msgs: str,
     result_str += remote_url
     result_str += previous_descriptions
     result_str += "\n-----\n".join(map(lambda m: "\n".join(m), msgs))
+
+    # Truncate description gracefully if description buffer overflows
+    result_str = (result_str[:TNT_DESCRIPTION_MAX_SIZE] + '\n...') if len(result_str) > TNT_DESCRIPTION_MAX_SIZE else result_str
 
     return result_str, start_date
