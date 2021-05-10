@@ -3,7 +3,6 @@ from __future__ import annotations
 import json
 import os
 import pkgutil
-from datetime import timedelta, datetime
 from functools import reduce
 from getpass import getpass
 from typing import List, Tuple
@@ -12,7 +11,6 @@ import keyring
 import requests
 from requests import Response
 import stat
-import importlib.resources as pkg_resources
 
 from TNTGitHook.entities import *
 from TNTGitHook.exceptions import NoCredentialsError, AuthError, NotFoundError
@@ -20,6 +18,8 @@ from TNTGitHook.utils import DateTimeEncoder, first, to_class
 
 NAME: str = "TNTGitHook"
 DEFAULT_CONFIG_FILE_PATH: str = f".git/hooks/{NAME}Config.json"
+# In fact is 2048, but as we are going to substitute the last characters for \n... we need 5 empty at the end
+TNT_DESCRIPTION_MAX_SIZE = 2043
 
 
 class Config:
@@ -85,7 +85,7 @@ def setup(config: Config):
         with open(path, "w") as f:
             f.write(json.dumps(prj_config.__dict__, sort_keys=True, indent=4))
     except FileNotFoundError:
-        print("Unable to setup hook. Is this a git repository?")
+        print("Unable to setup hook. Is this a git repository?\nMaybe you're not at the root folder.")
     except Exception as ex:
         print(ex)
 
@@ -212,7 +212,6 @@ def generate_info(commit_msgs: str,
 
     def msg_parser(msg: str) -> Tuple[str, str, str, str]:
         items = msg.split(";")
-        # return items[0], items[1], items[2]
         return items[0], items[1], items[2], items[3]
 
     lines = commit_msgs.split("\n")[::-1]
@@ -231,5 +230,8 @@ def generate_info(commit_msgs: str,
     result_str += remote_url
     result_str += previous_descriptions
     result_str += "\n-----\n".join(map(lambda m: "\n".join(m), msgs))
+
+    # Truncate description gracefully if description buffer overflows
+    result_str = (result_str[:TNT_DESCRIPTION_MAX_SIZE] + '\n...') if len(result_str) > TNT_DESCRIPTION_MAX_SIZE else result_str
 
     return result_str, start_date
