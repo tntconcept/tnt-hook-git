@@ -5,10 +5,10 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="TNTGitHook",
-    version="0.4.1",
+    version="0.4.2",
     author="Autentia",
     author_email="info@autentia.com",
-    description="Utility to auto imputate activities in TNT",
+    description="Utility to auto impute activities in TNT",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://gitlab.com/autentia/internal/TNTGitHook.git",
