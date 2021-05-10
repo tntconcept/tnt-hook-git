@@ -9,6 +9,7 @@ from typing import List, Tuple
 
 import keyring
 import requests
+from keyring.errors import PasswordDeleteError
 from requests import Response
 import stat
 
@@ -58,8 +59,17 @@ class PrjConfig:
 
 
 def ask_credentials():
-    keyring.set_password(f"com.autentia.{NAME}", "username", input("User: "))
-    keyring.set_password(f"com.autentia.{NAME}", "password", getpass())
+    # Store the user as single value in keychain to avoid multiple ask for password
+    username = input("User: ")
+    password = getpass()
+    keyring.set_password(f"com.autentia.{NAME}", "credentials", f"{username}:{password}")
+    # TODO: remove code below when every user has migrated
+    try:
+        keyring.delete_password(f"com.autentia.{NAME}", "username")
+        keyring.delete_password(f"com.autentia.{NAME}", "password")
+    except PasswordDeleteError:
+        # We have already deleted old values, no true error so we can continue
+        pass
 
 
 def setup(config: Config):
@@ -157,10 +167,7 @@ def find_autocreated_activity(description: str, remote: str):
 
 
 def generate_request_headers(config):
-    username = keyring.get_password(f"com.autentia.{NAME}", "username")
-    password = keyring.get_password(f"com.autentia.{NAME}", "password")
-    if not username or not password:
-        raise NoCredentialsError()
+    username, password = retrieve_keychain_credentials()
     headers = {"Authorization": "Basic " + config.basic_auth}
     payload = {"grant_type": "password",
                "username": username,
@@ -171,6 +178,28 @@ def generate_request_headers(config):
     access_token = token_response.json()["access_token"]
     headers = {"Authorization": "Bearer " + access_token}
     return headers
+
+
+def retrieve_keychain_credentials():
+    credentials = keyring.get_password(f"com.autentia.{NAME}", "credentials")
+    # TODO: backwards compatibility. Leave only else code when all users migrated to new credentials management
+    if not credentials:
+        username = keyring.get_password(f"com.autentia.{NAME}", "username")
+        password = keyring.get_password(f"com.autentia.{NAME}", "password")
+    else:
+        tokens = credentials.split(sep=":", maxsplit=2)
+        username = tokens[0]
+        password = tokens[1]
+        keyring.set_password(f"com.autentia.{NAME}", "credentials", f"{username}:{password}")
+        try:
+            keyring.delete_password(f"com.autentia.{NAME}", "username")
+            keyring.delete_password(f"com.autentia.{NAME}", "password")
+        except PasswordDeleteError:
+            # We have already deleted old values, no true error so we can continue
+            pass
+    if not username or not password:
+        raise NoCredentialsError()
+    return username, password
 
 
 def check_role_exists(config, headers, project, role_name):
