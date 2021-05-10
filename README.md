@@ -112,3 +112,10 @@ To upload to Nexus (you'll need to have twine installed: `pip3 install twine`):
 ```bash
 python3 -m twine upload --repository-url https://tnt.autentia.com/nexus/repository/autentia-pypi/ dist/*
 ```
+
+If the process fails with this error:
+```bash
+HTTPError: 400 Bad Request from https://tnt.autentia.com/nexus/repository/autentia-pypi/
+Repository does not allow updating assets: autentia-pypi
+```
+check that you don't have old artifacts in `dist` folder. In that case, delete accordingly.
