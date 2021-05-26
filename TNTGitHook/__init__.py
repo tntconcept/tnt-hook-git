@@ -1,6 +1,6 @@
 import argparse
 import json
-import os
+from pathlib import Path
 
 from TNTGitHook.hook import create_activity, Config, ask_credentials, PrjConfig, setup, DEFAULT_CONFIG_FILE_PATH, NAME, \
     read_commit_msgs
@@ -38,6 +38,14 @@ def main(argv=None):
     with open(config_file) as config_file:
         prj_config: PrjConfig = json.load(config_file, object_hook=lambda x: to_class(x, PrjConfig))
         config.timeout = prj_config.timeout
+
+        # Detect if new script has been written to user home
+        home = str(Path.home())
+        path = f"{home}/bin/tnt_git_hook"
+        if not Path(path).is_file():
+            hook.write_hook_script()
+            hook.write_pre_push_script(config, setup_config=False)
+
         try:
             create_activity(config=config,
                             prj_config=prj_config,
