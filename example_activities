@@ -1,0 +1,128 @@
+[
+    {
+        "date": "2021-05-06",
+        "workedMinutes": 600,
+        "activities": [
+            {
+                "id": 250112,
+                "startDate": "2021-05-06T08:00:00",
+                "duration": 0,
+                "description": "###Autocreated evidence###\n(DO NOT DELETE)\ngit@github.com:autentia/binnacle-api-kotlin.git\n323908b57941e55e9807c0460a351f9e637c4b6a\n2019-07-18T16:23:19+02:00\nEmanuel Suca <esuca@autentia.com>\nfirst commit\n-----\na25f278dd62857c4742d16197d6a4cc1aa160b05\n2019-07-18T16:26:09+02:00\nEmanuel Suca <esuca@autentia.com>\nfinishes the basic api\n-----\n84354e454c70586d52fcd0a307b675100bd3c350\n2019-07-19T14:52:07+02:00\nEmanuel Suca <esuca@autentia.com>\nfixes userId type of service and repository\n-----\n99da6c258d6f520458f7aa353a86e7974a742c8e\n2019-07-19T14:52:17+02:00\nEmanuel Suca <esuca@autentia.com>\nadds readme\n-----\ned27a9962a54a4d8ffe5dd1ac474f9271672fb8c\n2019-07-19T14:53:51+02:00\nEmanuel Suca <esuca@autentia.com>\nfixes userid type\n-----\n62e056d89590cd93c120393c15604769398cd2e0\n2019-07-19T14:56:05+02:00\nEmanuel Suca <esuca@autentia.com>\nremoves comments of time balance controller\n-----\n146dd1b3453c021cf842a71d5462dc0970249921\n2019-07-24T08:20:36+02:00\nEmanuel Suca <esuca@autentia.com>\nadds postman endpoints and the new binnacle design\n-----\nc30f79e7c82988792369a9e9606fe2c66f5463e6\n2019-08-12T14:30:07+02:00\ndavid.plaza <david.plaza@autentia.com>\nUser controller added and tested.\n-----\n5bd07d32927e0b7a017c1af68cb2ac472fc5cce1\n2019-08-12T16:32:11+02:00\ndavid.plaza <david.plaza@autentia.com>\nall integration test of controllers\n-----\n7781b150a5c87c049e8f40be4e73f9f1a95c0fa2\n2019-08-13T09:57:43+02:00\ndavid.plaza <david.plaza@autentia.com>\nHoliday Controller integration test done\n-----\ne2433f1ae16531cadaa2d816d91bf91843d1321a\n2019-08-13T16:57:53+02:00\ndavid.plaza <david.plaza@autentia.com>\nTest container implemented but not working\n-----\nfce1af416b8b5b6d9effff39b7d31f8f465bd6ff\n2019-08-14T14:45:29+02:00\ndavid.plaza <david.plaza@autentia.com>\nrepository test working with docker container\n-----\nbde82e513e7facedaf34c8e38aac403a1dc6c547\n2019-08-19T12:43:06+02:00\ndavid.plaza <david.plaza@autentia.com>\nldap container working but cannot get connection\n-----\ne03997ebcc4f8322277d9422bc1ee92eea403ede\n2019-11-04T00:35:46+01:00\nEmanuel Suca <e",
+                "projectRole": {
+                    "id": 10,
+                    "name": "desarrollo",
+                    "requireEvidence": true
+                },
+                "userId": 93,
+                "billable": false,
+                "organization": {
+                    "id": 3,
+                    "name": "Autentia Real Business Solutions S.L."
+                },
+                "project": {
+                    "id": 47,
+                    "name": "i+d - Desarrollo TNT Concept",
+                    "open": true,
+                    "billable": false
+                },
+                "hasImage": false
+            },
+            {
+                "id": 250199,
+                "startDate": "2021-05-06T08:00:00",
+                "duration": 0,
+                "description": "###Autocreated evidence###\n(DO NOT DELETE)\ngit@gitlab.com:autentia/internal/tnt-hook-git.git\nb287b94c4fdcccc426f828bd5e15e62139e0223f\n2020-05-27T13:20:21+02:00\nDaniel Otero <dotero@autentia.com>\nInitial commit\n-----\n32ba4934eebfde5670b05f930efa8cfa4b97a59e\n2020-05-27T13:33:11+02:00\nDaniel Otero <dotero@autentia.com>\nFix issue with date string format\n-----\n066fde1d3994514ace4de6f94db479c3e36b2a52\n2020-05-27T18:13:45+02:00\nDaniel Otero <dotero@autentia.com>\nRefactor to be able to distribute package.\n-----\n834611d6ccc1c4b82f2b410839579a476a7c2058\n2020-05-29T13:24:53+02:00\nDaniel Otero <dotero@autentia.com>\nFinished prototype implementation. Integrated with keyring to store credentials\n-----\n2958afdbfeaf295df6a0f1f8efd997db9baf0d93\n2020-05-29T13:26:26+02:00\nDaniel Otero <dotero@autentia.com>\nAdd message\n-----\n0b6f15f8e95e46a5a284d318641ae1a1bfc6d14e\n2020-05-29T13:30:20+02:00\nDaniel Otero <dotero@autentia.com>\nIncreased version and improved readme\n-----\n7e6ddc16a0857377d8bd36cace557874fe9f0f57\n2020-06-12T11:24:24+02:00\nDaniel Otero <dotero@autentia.com>\nFixed several issues\n-----\n467d1c63a468fd44224c59bb7c944280a0ef3e52\n2020-06-12T11:33:27+02:00\nDaniel Otero <dotero@autentia.com>\nFixed missing dependency\n-----\nff944d6850fc7e4c6ec4d9040379c6786f09c592\n2020-06-17T12:19:22+02:00\nDaniel Otero <dotero@autentia.com>\nSeveral fixes. Updated Readme with install and setup instructions\n-----\na6c83494821d63b65ce518a179fe0e9f0b2def03\n2020-06-26T10:39:37+02:00\nDaniel Otero <dotero@autentia.com>\nFixed bug when pushing to a completely clean remote. Added remote URL to the description\n-----\n43db2bf5ba3ce83033c9cbd22378854f2163ec67\n2020-06-26T10:42:14+02:00\nDaniel Otero <dotero@autentia.com>\n.gitignore\n-----\n0fe34f4c717b3e96d962d1e2127f75210f96b174\n2020-06-30T09:21:33+02:00\nDaniel Otero <dotero@autentia.com>\nAdded capability of ignoring errors to be able to push even if hook fails for whatever reason (default to false)\n-----\n9fd4c45a606c835e401bbc4f0772cb28003ca407\n2020-06-30T13:42:16+02:00\nDaniel Otero <dotero@autentia.com>\nImplemente",
+                "projectRole": {
+                    "id": 30,
+                    "name": "desarrollo",
+                    "requireEvidence": true
+                },
+                "userId": 93,
+                "billable": false,
+                "organization": {
+                    "id": 3,
+                    "name": "Autentia Real Business Solutions S.L."
+                },
+                "project": {
+                    "id": 68,
+                    "name": "i+d - Desarrollos de Software Interno",
+                    "open": true,
+                    "billable": false
+                },
+                "hasImage": false
+            },
+            {
+                "id": 250113,
+                "startDate": "2021-05-06T09:30:00",
+                "duration": 330,
+                "description": "#177977794: Creación de pipeline con GitHub Actions",
+                "projectRole": {
+                    "id": 10,
+                    "name": "desarrollo",
+                    "requireEvidence": true
+                },
+                "userId": 93,
+                "billable": false,
+                "organization": {
+                    "id": 3,
+                    "name": "Autentia Real Business Solutions S.L."
+                },
+                "project": {
+                    "id": 47,
+                    "name": "i+d - Desarrollo TNT Concept",
+                    "open": true,
+                    "billable": false
+                },
+                "hasImage": false
+            },
+            {
+                "id": 250262,
+                "startDate": "2021-05-06T15:00:00",
+                "duration": 210,
+                "description": "#177977794: Creación de pipeline con GitHub Actions",
+                "projectRole": {
+                    "id": 10,
+                    "name": "desarrollo",
+                    "requireEvidence": true
+                },
+                "userId": 93,
+                "billable": false,
+                "organization": {
+                    "id": 3,
+                    "name": "Autentia Real Business Solutions S.L."
+                },
+                "project": {
+                    "id": 47,
+                    "name": "i+d - Desarrollo TNT Concept",
+                    "open": true,
+                    "billable": false
+                },
+                "hasImage": false
+            },
+            {
+                "id": 250263,
+                "startDate": "2021-05-06T18:30:00",
+                "duration": 60,
+                "description": "Revisión y elaboración documento Política de Seguridad de la Información",
+                "projectRole": {
+                    "id": 36,
+                    "name": "AutoFormacion",
+                    "requireEvidence": false
+                },
+                "userId": 93,
+                "billable": false,
+                "organization": {
+                    "id": 3,
+                    "name": "Autentia Real Business Solutions S.L."
+                },
+                "project": {
+                    "id": 74,
+                    "name": "frm - Formacion / Charlas internas",
+                    "open": true,
+                    "billable": false
+                },
+                "hasImage": false
+            }
+        ]
+    }
+]

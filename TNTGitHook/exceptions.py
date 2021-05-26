@@ -9,6 +9,17 @@ class AuthError(Exception):
         return "Invalid credentials, use 'TNTGitHook --set-credentials' to fix them"
 
 
+class NetworkError(Exception):
+    status: int
+
+    def __init__(self, status: int = 400):
+        self.status = status
+
+    def __str__(self):
+        # return "TNT not reachable or malfunctioning. Please, check availability."
+        return f"TNT not reachable or malfunctioning. Please, check availability. HTTP return code: {self.status}"
+
+
 class NotFoundError(Exception):
     item: str
     value: str
