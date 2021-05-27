@@ -80,15 +80,14 @@ def setup(config: Config):
 
 def write_hook_script():
     hook_script = pkgutil.get_data('TNTGitHook', 'misc/tnt_git_hook.sh').decode('utf8')
-    home = str(Path.home())
     try:
-        path = f"{home}/bin/tnt_git_hook"
+        path = f"/usr/local/bin/tnt_git_hook"
         with open(path, "w") as file:
             file.write(hook_script)
             stats = os.stat(path)
             os.chmod(path, stats.st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
     except FileNotFoundError:
-        print(f"Unable to setup hook script. Are you able to write to {home}/bin?")
+        print(f"Unable to setup hook script. Are you able to write to /usr/local/bin?")
     except Exception as ex:
         print(ex)
 
