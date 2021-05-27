@@ -23,6 +23,6 @@ setuptools.setup(
     install_requires=['requests', 'keyring'],
     scripts=["bin/TNTGitHook"],
     package_data={
-        "TNTGitHook": ["misc/pre-push.sh"]
+        "TNTGitHook": ["misc/pre-push.sh", "misc/tnt_git_hook.sh"]
     }
 )

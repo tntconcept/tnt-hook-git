@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+from pathlib import Path
 import pkgutil
 from functools import reduce
 from getpass import getpass
@@ -73,27 +74,48 @@ def ask_credentials():
 
 
 def setup(config: Config):
-    script = pkgutil.get_data('TNTGitHook', 'misc/pre-push.sh').decode('utf8')
+    write_hook_script()
+    write_pre_push_script(config, setup_config=True)
+
+
+def write_hook_script():
+    hook_script = pkgutil.get_data('TNTGitHook', 'misc/tnt_git_hook.sh').decode('utf8')
+    home = str(Path.home())
+    try:
+        path = f"{home}/bin/tnt_git_hook"
+        with open(path, "w") as file:
+            file.write(hook_script)
+            stats = os.stat(path)
+            os.chmod(path, stats.st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
+    except FileNotFoundError:
+        print(f"Unable to setup hook script. Are you able to write to {home}/bin?")
+    except Exception as ex:
+        print(ex)
+
+
+def write_pre_push_script(config: Config, setup_config: bool = False):
+    pre_push_script = pkgutil.get_data('TNTGitHook', 'misc/pre-push.sh').decode('utf8')
     try:
         path = ".git/hooks/pre-push"
         with open(path, "w") as f:
-            f.write(script)
+            f.write(pre_push_script)
             st = os.stat(path)
             os.chmod(path, st.st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
 
-        headers = generate_request_headers(config)
-        organization = check_organization_exists(config, headers, input("Organization: "))
-        project = check_project_exists(config, headers, organization, input("Project: "))
-        role = check_role_exists(config, headers, project, input("Role: "))
+        if setup_config:
+            headers = generate_request_headers(config)
+            organization = check_organization_exists(config, headers, input("Organization: "))
+            project = check_project_exists(config, headers, organization, input("Project: "))
+            role = check_role_exists(config, headers, project, input("Role: "))
 
-        path = DEFAULT_CONFIG_FILE_PATH
-        prj_config = PrjConfig()
-        prj_config.organization = organization.name
-        prj_config.project = project.name
-        prj_config.role = role.name
+            path = DEFAULT_CONFIG_FILE_PATH
+            prj_config = PrjConfig()
+            prj_config.organization = organization.name
+            prj_config.project = project.name
+            prj_config.role = role.name
 
-        with open(path, "w") as f:
-            f.write(json.dumps(prj_config.__dict__, sort_keys=True, indent=4))
+            with open(path, "w") as f:
+                f.write(json.dumps(prj_config.__dict__, sort_keys=True, indent=4))
     except FileNotFoundError:
         print("Unable to setup hook. Is this a git repository?\nMaybe you're not at the root folder.")
     except Exception as ex:
