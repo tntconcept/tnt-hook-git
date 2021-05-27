@@ -199,7 +199,7 @@ class HookTestCase(unittest.TestCase):
         response = hook.check_role_exists(self.config, "", self.projectA, "Test Role")
         self.assertEqual(0, response.id)
 
-    def test_find_evidence_should_return_None_if_this_is_not_the_first(self):
+    def test_find_evidence_should_return_None_if_this_is_the_first(self):
         prjConfig = PrjConfig()
         prjConfig.organization = "New Organization"
         prjConfig.project = "New Project"
