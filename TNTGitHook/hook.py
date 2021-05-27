@@ -14,7 +14,7 @@ from requests import Response
 import stat
 
 from TNTGitHook.entities import *
-from TNTGitHook.exceptions import NoCredentialsError, AuthError, NotFoundError
+from TNTGitHook.exceptions import NoCredentialsError, AuthError, NotFoundError, NetworkError
 from TNTGitHook.utils import DateTimeEncoder, first, to_class
 
 NAME: str = "TNTGitHook"
@@ -128,11 +128,9 @@ def create_activity(config: Config,
                                       params={"startDate": str(now), "endDate": str(now)},
                                       headers=headers,
                                       timeout=config.timeout)
-    activities_response: List[ActivitiesResponse]
-    activities_response = json.loads(response.text, object_hook=lambda x: to_class(x, cls=ActivitiesResponse))
-    activities = reduce(lambda r, a: r + a.activities, activities_response, [])
-    existing_activity = first(lambda a: find_autocreated_activity(a.description, remote), activities)
-
+    activities = parse_activities(response.text)
+    # existing_activity = first(lambda a: find_autocreated_activity(a.description, remote), activities)
+    existing_activity = find_automatic_evidence(prj_config, activities)
     info: (str, datetime, int) = generate_info(commit_msgs,
                                                existing_activity,
                                                remote_url=remote)
@@ -157,13 +155,21 @@ def create_activity(config: Config,
         print("Successfully created activity for " + project_name + " - " + role_name)
 
 
-def find_autocreated_activity(description: str, remote: str):
-    prefix = PrjConfig.activity_prefix()
-    result = prefix in description
-    description = description.replace(prefix + "\n", "")
-    if remote:
-        result = result and remote in description.split("\n")[0]
-    return result
+def parse_activities(response_body) -> List[Activity]:
+    activities_response: List[ActivitiesResponse]
+    activities_response = json.loads(response_body, object_hook=lambda x: to_class(x, cls=ActivitiesResponse))
+    activities = reduce(lambda r, a: r + a.activities, activities_response, [])
+    return activities
+
+
+def find_automatic_evidence(prjConfig: PrjConfig, activities: List[Activity]) -> Activity:
+    prefix = prjConfig.activity_prefix()
+    for activity in activities:
+        if prefix in activity.description and\
+                prjConfig.organization == activity.organization.name and\
+                prjConfig.project == activity.project.name and\
+                prjConfig.role == activity.projectRole.name:
+            return activity
 
 
 def generate_request_headers(config):
@@ -206,6 +212,8 @@ def check_role_exists(config, headers, project, role_name):
     response: Response = requests.get(config.baseURL + "projects/" + str(project.id) + "/roles",
                                       headers=headers, timeout=config.timeout)
     response.encoding = 'utf-8'
+    if response.status_code != 200:
+        raise NetworkError()
     roles: List[Role] = json.loads(response.text, object_hook=lambda x: to_class(x, cls=Role))
     role = first(lambda r: r.name == role_name, roles)
     if not role:
@@ -217,6 +225,8 @@ def check_project_exists(config, headers, organization, project_name):
     response: Response = requests.get(config.baseURL + "organizations/" + str(organization.id) + "/projects",
                                       headers=headers, timeout=config.timeout)
     response.encoding = 'utf-8'
+    if response.status_code != 200:
+        raise NetworkError()
     projects: List[Project] = json.loads(response.text, object_hook=lambda x: to_class(x, cls=Project))
     project = first(lambda p: p.name == project_name, projects)
     if not project:
@@ -227,6 +237,8 @@ def check_project_exists(config, headers, organization, project_name):
 def check_organization_exists(config, headers, organization_name):
     response: Response = requests.get(config.baseURL + "organizations", headers=headers, timeout=config.timeout)
     response.encoding = 'utf-8'
+    if response.status_code != 200:
+        raise NetworkError()
     organizations: List[Organization] = json.loads(response.text, object_hook=lambda x: to_class(x, cls=Organization))
     organization = first(lambda o: o.name == organization_name, organizations)
     if not organization:
