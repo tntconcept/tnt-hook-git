@@ -26,3 +26,4 @@ setuptools.setup(
         "TNTGitHook": ["misc/pre-push.sh", "misc/tnt_git_hook.sh"]
     }
 )
+
