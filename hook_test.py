@@ -13,11 +13,9 @@ from unittest.mock import patch, MagicMock
 import httpretty
 import warnings
 
-from keyring.errors import PasswordDeleteError
-
 from TNTGitHook import hook
 from TNTGitHook.exceptions import AuthError, NotFoundError, NetworkError
-from TNTGitHook.hook import Config, find_automatic_evidence, PrjConfig, parse_activities
+from TNTGitHook.hook import Config, find_automatic_evidence, PrjConfig, parse_activities, generate_info
 from TNTGitHook.entities import *
 
 
@@ -25,7 +23,8 @@ class HookTestCase(unittest.TestCase):
 
     config = Config.config(debug=True)
     fake_auth_token: str
-    fake_activitites: List[Activity]
+    fake_activities: List[Activity]
+    other_activities: List[Activity]
     organizationA: Organization
     organizationB: Organization
     fake_organizations: str
@@ -222,6 +221,17 @@ class HookTestCase(unittest.TestCase):
         prjConfig.role = "AutoFormacion"
         self.assertIsNone(find_automatic_evidence(prjConfig, self.fake_activities))
 
+    def test_generate_info(self):
+        prjConfig = PrjConfig()
+        prjConfig.organization = "Autentia Real Business Solutions S.L."
+        prjConfig.project = "i+d - Desarrollos de Software Interno"
+        prjConfig.role = "desarrollo"
+        evidence = find_automatic_evidence(prjConfig, self.other_activities)
+        info = generate_info(self.commit_messages, evidence, "")
+        print(info[0])
+        self.assertIsNotNone(info)
+        self.assertRegex(info[0], r'(^###Autocreated evidence###\n\(DO NOT DELETE\)\n)')
+
     def get_regex(self) -> str:
         header = r'(^###Autocreated evidence###\n\(DO NOT DELETE\)\n){1}'
         sha = r'([\da-f]{40}\n)'
@@ -246,9 +256,16 @@ class HookTestCase(unittest.TestCase):
             }
         )
 
+        with open('new_branch_commits') as commits:
+            self.commit_messages = commits.read()
+
         with open('example_activities') as example_activities:
             data = example_activities.read()
         self.fake_activities = parse_activities(data)
+
+        with open('other_activities.json') as other_activities:
+            data = other_activities.read()
+        self.other_activities = parse_activities(data)
 
         self.organizationA = Organization().with_id(0).with_name("Test Organization")
         self.organizationB = Organization().with_id(1).with_name("Another Organization")

@@ -5,7 +5,10 @@ local_ref=$1
 local_sha=$2
 remote_ref=$3
 remote_sha=$4
+PROJECT_PATH=$5
+CURRENT_PATH=$(pwd)
 
+cd $PROJECT_PATH||exit 1
 if [ -n "$local_sha" ] && [ -n "$remote_sha" ] && [ $((16#$local_sha)) -ne 0 ]
 then
   CMD='git log --pretty="format:%H;%aI;%an <%ae>;%s"'
@@ -25,6 +28,8 @@ then
   if [ $? -ne 0 ]
   then
     echo "Unable to retrieve git log information, will not create evidence on TNT but push continues"
+    rm $FILENAME
+    cd $CURRENT_PATH || exit 0
     exit 0
   fi
 
@@ -34,4 +39,4 @@ then
   TNTGitHook --commit-msgs-file $FILENAME --remote $REMOTE
   rm $FILENAME
 fi
-
+cd $CURRENT_PATH || exit 0
