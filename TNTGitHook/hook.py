@@ -149,7 +149,6 @@ def create_activity(config: Config,
                                       headers=headers,
                                       timeout=config.timeout)
     activities = parse_activities(response.text)
-    # existing_activity = first(lambda a: find_autocreated_activity(a.description, remote), activities)
     existing_activity = find_automatic_evidence(prj_config, activities)
     info: (str, datetime, int) = generate_info(commit_msgs,
                                                existing_activity,
@@ -272,10 +271,12 @@ def generate_info(commit_msgs: str,
     prefix = PrjConfig.activity_prefix()
 
     def msg_parser(msg: str) -> Tuple[str, str, str, str]:
+        if msg.count(";") != 3:
+            return "", "", "", ""
         items = msg.split(";")
         return items[0], items[1], items[2], items[3]
 
-    lines = commit_msgs.split("\n")[::-1]
+    lines = filter(None, commit_msgs.split("\n")[::-1])
     msgs: [Tuple[str, str, datetime, str]] = list(map(msg_parser, lines))
 
     start_date: datetime = datetime.now().replace(hour=5, minute=0, second=0, microsecond=0, tzinfo=None)

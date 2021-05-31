@@ -5,10 +5,11 @@ local_ref=$1
 local_sha=$2
 remote_ref=$3
 remote_sha=$4
+PROJECT_PATH=$5
 
 if [ -n "$local_sha" ] && [ -n "$remote_sha" ] && [ $((16#$local_sha)) -ne 0 ]
 then
-  CMD='git log --pretty="format:%H;%aI;%an <%ae>;%s"'
+  CMD='git log --git-dir '"$PROJECT_PATH"' --pretty="format:%H;%aI;%an <%ae>;%s"'
   if [ $((16#$remote_sha)) -ne 0 ]
   then
     CMD="$CMD $remote_sha..$local_sha"

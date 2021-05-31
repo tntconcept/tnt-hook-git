@@ -1,9 +1,4 @@
 import unittest
-from unittest.mock import patch, MagicMock, PropertyMock
-
-from requests import Response
-
-
 from TNTGitHook.hook import parse_activities
 from TNTGitHook.utils import DateTimeEncoder, OrganizationListDecoder, to_class
 from datetime import datetime
