@@ -64,22 +64,12 @@ Create the following script on `<your-git-project>/.git/hooks/pre-push`
 
 ```bash
 #!/bin/bash
+set -o pipefail
 
 read local_ref local_sha remote_ref remote_sha
-
-if [ -n "$local_sha" ] && [ -n "$remote_sha" ]
-then
-  if [ $((16#$remote_sha)) -eq 0 ]
-  then
-    MSGS=`git log --pretty="format:%H;%aI;%an <%ae>;%s"`
-  else
-    MSGS=`git log --pretty="format:%H;%aI;%an <%ae>;%s" $remote_sha..$local_sha`
-  fi
-  REMOTE=`git ls-remote --get-url | head -1`
-
-  # Assumes TNTGitHook is on PATH
-  TNTGitHook --commit-msgs "$MSGS" --remote $REMOTE
-fi
+PROJECT_PATH=$(git rev-parse --show-toplevel)
+# Assumes tnt_git_hook.sh is on PATH
+tnt_git_hook $local_ref $local_sha $remote_ref $remote_sha $PROJECT_PATH
 ```
 
 And give it execution permission:
@@ -88,7 +78,7 @@ And give it execution permission:
 chmod +x .git/hooks/pre-push
 ```
 
-Also create a file **.git/hooks/TNTGitHookConfig.json** to indicate to which project imputate. Example:
+Also create a file **.git/hooks/TNTGitHookConfig.json** to indicate to which project impute. Double check that the information is as showed in TNT. Example:
 
 ```json
 {
@@ -98,10 +88,66 @@ Also create a file **.git/hooks/TNTGitHookConfig.json** to indicate to which pro
 }
 ```
 
+Create this script in `/usr/local/bin/tnt_git_hook.sh`
+```bash
+#!/bin/bash
+set -o pipefail
 
+local_ref=$1
+local_sha=$2
+remote_ref=$3
+remote_sha=$4
+PROJECT_PATH=$5
+CURRENT_PATH=$(pwd)
+
+cd $PROJECT_PATH||exit 1
+if [ -n "$local_sha" ] && [ -n "$remote_sha" ] && [ $((16#$local_sha)) -ne 0 ]
+then
+  CMD='git log --pretty="format:%H;%aI;%an <%ae>;%s"'
+  if [ $((16#$remote_sha)) -ne 0 ]
+  then
+    CMD="$CMD $remote_sha..$local_sha"
+  else
+# Remote being created or deleted. For complete information view: https://www.git-scm.com/docs/githooks#_pre_push
+# We are going to retrieve the commits only accessible from the current branch (local_ref)
+    CMD="$CMD $local_ref --not $(git for-each-ref --format='%(refname)' refs/heads/ | grep -v "refs/heads/$local_ref")"
+  fi
+  CMD="$CMD 2> /dev/null"
+  FILENAME="/tmp/tnt-git-hook-commits-$(date +%s)"
+  eval $CMD > $FILENAME
+
+  # Do nothing on error, just inform and go ahead with "git push" (i.e. conflicts)
+  if [ $? -ne 0 ]
+  then
+    echo "Unable to retrieve git log information, will not create evidence on TNT but push continues"
+    rm $FILENAME
+    cd $CURRENT_PATH || exit 0
+    exit 0
+  fi
+
+  REMOTE=$(git ls-remote --get-url | head -1)
+
+  # Assumes TNTGitHook is on PATH
+  TNTGitHook --commit-msgs-file $FILENAME --remote $REMOTE
+  rm $FILENAME
+fi
+cd $CURRENT_PATH || exit 0
+```
+
+And give it execution permission:
+
+```bash
+chmod +x /usr/local/bin/tnt_git_hook.sh
+```
 ### Build release 
 
-To build Pypi, modify setup.py accordingly (versions, name, etc) package run
+To build Pypi, modify setup.py accordingly (versions, name, etc) package.
+Verify that you don't have old execution folders:
+* build/
+* dist/
+* TNTGitHook.egg-info/
+
+Then execute
 
 ```bash
 python3 setup.py sdist bdist_wheel
