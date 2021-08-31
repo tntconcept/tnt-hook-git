@@ -211,17 +211,17 @@ def retrieve_keychain_credentials():
     if not credentials:
         username = keyring.get_password(f"com.autentia.{NAME}", "username")
         password = keyring.get_password(f"com.autentia.{NAME}", "password")
+        keyring.set_password(f"com.autentia.{NAME}", "credentials", f"{username}:{password}")
     else:
         tokens = credentials.split(sep=":", maxsplit=2)
         username = tokens[0]
         password = tokens[1]
-        keyring.set_password(f"com.autentia.{NAME}", "credentials", f"{username}:{password}")
-        try:
-            keyring.delete_password(f"com.autentia.{NAME}", "username")
-            keyring.delete_password(f"com.autentia.{NAME}", "password")
-        except PasswordDeleteError:
-            # We have already deleted old values, no true error so we can continue
-            pass
+    try:
+        keyring.delete_password(f"com.autentia.{NAME}", "username")
+        keyring.delete_password(f"com.autentia.{NAME}", "password")
+    except PasswordDeleteError:
+        # We have already deleted old values, no true error so we can continue
+        pass
     if not username or not password:
         raise NoCredentialsError()
     return username, password
