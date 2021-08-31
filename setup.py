@@ -20,7 +20,7 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     python_requires='>=3.6',
-    install_requires=['requests', 'keyring'],
+    install_requires=['requests==2.26.0', 'keyring==23.1.0'],
     scripts=["bin/TNTGitHook"],
     package_data={
         "TNTGitHook": ["misc/pre-push.sh", "misc/tnt_git_hook.sh"]
