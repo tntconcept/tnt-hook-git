@@ -28,7 +28,7 @@ trusted-host = tnt.autentia.com
 To install or upgrade the TNTGitHook utility run the following command:
 
 ```bash
-pip3 install --upgrade TNTGitHook
+python3 -m pip install --upgrade TNTGitHook --user
 ```
 
 
@@ -37,7 +37,7 @@ pip3 install --upgrade TNTGitHook
 Once everything is installed, in order to set TNT login credentials, use the following command:
 
 ```bash
-TNTGitHook --set-credentials
+python3 -m TNTGitHook --set-credentials
 ```
 
 Credentials will be secured using system APIs, keychain in macOS, several options on Linux depending on desktop, and whatever security Windows may have. Check https://pypi.org/project/keyring/ for more detail
@@ -50,7 +50,7 @@ Once utility is installed, in order to auto imputate on each git push, you must 
 **This configuration is per git repository!**
 
 ```bash
-TNTGitHook --setup
+python3 -m TNTGitHook --setup
 ```
 
 It will prompt you for the organization, project and role names (they must match exactly with the ones on TNT, otherwise tool will complain).
