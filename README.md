@@ -1,6 +1,6 @@
 # TNT Git Hook
 
-This is a simple, per project, Git pre push hook, so when you push your commits an auto evidence is created in the asociated TNT project.
+This is a simple, per project, Git pre push hook, so when you push your commits an auto evidence is created in the associated TNT project.
 
 **If you use this hook you DO NOT NEED to add manualy a photo as evidence!**
 
@@ -11,9 +11,9 @@ Requirements:
 - Python 3.7
 - pip3
 
-To check if is alredy installed in your sistem you can try to run in the command line: `pip3 --version`
+To check if is already installed in your system you can try to run in the command line: `pip3 --version`
 
-If you need to install them, both can be obtained from python.org or with [homebrew](https://brew.sh/) (recomended!): `brew install python3`
+If you need to install them, both can be obtained from python.org or with [homebrew](https://brew.sh/) (recommended!): `brew install python3`
 
 Autentia private Nexus Pypi (package repository) must be added. Edit (or create if needed) the file `~/.pip/pip.conf`
 

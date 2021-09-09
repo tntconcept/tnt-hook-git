@@ -1,10 +1,10 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import pkgutil
 from functools import reduce
-from getpass import getpass
 from typing import List, Tuple
 
 import keyring
@@ -58,23 +58,25 @@ class PrjConfig:
         return "###Autocreated evidence###\n(DO NOT DELETE)"
 
 
-def ask_credentials():
-    # Store the user as single value in keychain to avoid multiple ask for password
-    username = input("User: ")
-    password = getpass()
-    keyring.set_password(f"com.autentia.{NAME}", "credentials", f"{username}:{password}")
-    # TODO: remove code below when every user has migrated
+def setup_config(config):
     try:
-        keyring.delete_password(f"com.autentia.{NAME}", "username")
-        keyring.delete_password(f"com.autentia.{NAME}", "password")
-    except PasswordDeleteError:
-        # We have already deleted old values, no true error so we can continue
-        pass
+        headers = generate_request_headers(config)
+        organization = check_organization_exists(config, headers, input("Organization: "))
+        project = check_project_exists(config, headers, organization, input("Project: "))
+        role = check_role_exists(config, headers, project, input("Role: "))
 
+        path = DEFAULT_CONFIG_FILE_PATH
+        prj_config = PrjConfig()
+        prj_config.organization = organization.name
+        prj_config.project = project.name
+        prj_config.role = role.name
 
-def setup(config: Config):
-    write_hook_script()
-    write_pre_push_script(config, setup_config=True)
+        with open(path, "w") as f:
+            f.write(json.dumps(prj_config.__dict__, sort_keys=True, indent=4))
+    except FileNotFoundError:
+        print("Unable to setup config. Is this a git repository?\nMaybe you're not at the root folder.")
+    except Exception as ex:
+        print(ex)
 
 
 def write_hook_script():
@@ -91,33 +93,9 @@ def write_hook_script():
         print(ex)
 
 
-def write_pre_push_script(config: Config, setup_config: bool = False):
-    pre_push_script = pkgutil.get_data('TNTGitHook', 'misc/pre-push.sh').decode('utf8')
-    try:
-        path = ".git/hooks/pre-push"
-        with open(path, "w") as f:
-            f.write(pre_push_script)
-            st = os.stat(path)
-            os.chmod(path, st.st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
-
-        if setup_config:
-            headers = generate_request_headers(config)
-            organization = check_organization_exists(config, headers, input("Organization: "))
-            project = check_project_exists(config, headers, organization, input("Project: "))
-            role = check_role_exists(config, headers, project, input("Role: "))
-
-            path = DEFAULT_CONFIG_FILE_PATH
-            prj_config = PrjConfig()
-            prj_config.organization = organization.name
-            prj_config.project = project.name
-            prj_config.role = role.name
-
-            with open(path, "w") as f:
-                f.write(json.dumps(prj_config.__dict__, sort_keys=True, indent=4))
-    except FileNotFoundError:
-        print("Unable to setup hook. Is this a git repository?\nMaybe you're not at the root folder.")
-    except Exception as ex:
-        print(ex)
+def get_hook_sha1():
+    hook_script = pkgutil.get_data('TNTGitHook', 'misc/tnt_git_hook.sh').decode('utf8')
+    return hashlib.sha1(hook_script.encode('utf8')).hexdigest()
 
 
 def read_commit_msgs(file: str):
