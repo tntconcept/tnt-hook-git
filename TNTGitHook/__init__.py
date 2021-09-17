@@ -1,6 +1,8 @@
 import argparse
 import json
 
+import requests
+
 from TNTGitHook.credentials import ask
 from TNTGitHook.hook import create_activity, Config, PrjConfig, DEFAULT_CONFIG_FILE_PATH, NAME, read_commit_msgs
 from TNTGitHook.hook_setup import is_update_needed, write_hook, setup
@@ -34,23 +36,31 @@ def main(argv=None):
     config_file = args.config or DEFAULT_CONFIG_FILE_PATH
 
     commit_msgs = args.commit_msgs if args.commit_msgs else read_commit_msgs(args.commit_msgs_file)
+    try:
+        with open(config_file) as config_file:
+            prj_config: PrjConfig = json.load(config_file, object_hook=lambda x: to_class(x, PrjConfig))
+            config.timeout = prj_config.timeout
 
-    with open(config_file) as config_file:
-        prj_config: PrjConfig = json.load(config_file, object_hook=lambda x: to_class(x, PrjConfig))
-        config.timeout = prj_config.timeout
+            if is_update_needed():
+                write_hook()
 
-        if is_update_needed():
-            write_hook()
+            try:
+                create_activity(config=config,
+                                prj_config=prj_config,
+                                commit_msgs=commit_msgs,
+                                remote=args.remote)
+            except requests.exceptions.RequestException as error:
+                print("Timeout generating activity due to request error, continue with the push")
+                print(error)
+                exit(0)
+            except Exception as error:
+                print("Could not register activity on TNT due to some errors:")
+                print(error)
 
-        try:
-            create_activity(config=config,
-                            prj_config=prj_config,
-                            commit_msgs=commit_msgs,
-                            remote=args.remote)
-        except Exception as error:
-            print("Could not register activity on TNT due to some errors:")
-            print(error)
+                if not prj_config.ignore_errors:
+                    exit(-1)
 
-            if not prj_config.ignore_errors:
-                exit(-1)
-
+    except Exception as error:
+        print("Could not register activity on TNT due to some errors:")
+        print(error)
+        exit(-1)

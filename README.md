@@ -15,7 +15,7 @@ To check if is already installed in your system you can try to run in the comman
 
 If you need to install them, both can be obtained from python.org or with [homebrew](https://brew.sh/) (recommended!): `brew install python3`
 
-Autentia private Nexus Pypi (package repository) must be added. Edit (or create if needed) the file `~/.pip/pip.conf`
+Autentia private Nexus Pypi (package repository) must be added. Edit (or create if needed) the file `~/.config/pip.conf`
 
 ```
 [global]
@@ -127,8 +127,11 @@ then
 
   REMOTE=$(git ls-remote --get-url | head -1)
 
-  # Assumes TNTGitHook is on PATH
-  TNTGitHook --commit-msgs-file $FILENAME --remote $REMOTE
+  if ! python3 -m TNTGitHook --commit-msgs-file $FILENAME --remote $REMOTE;
+  then
+    echo "Error executing python hook"
+    exit 1
+  fi
   rm $FILENAME
 fi
 cd $CURRENT_PATH || exit 0

@@ -23,7 +23,6 @@ def is_update_needed():
 def write_hook():
     print("Writing hook")
     write_hook_script()
-    write_pre_push_script()
     print("Hook written")
 
 
