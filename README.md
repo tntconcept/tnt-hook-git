@@ -25,6 +25,21 @@ extra-index-url = https://tnt.autentia.com/nexus/repository/autentia-pypi/simple
 trusted-host = tnt.autentia.com
 ```
 
+To check the file is properly configured run 
+
+`python3 -m pip config list`
+
+And it should show something like this
+
+```
+global.extra-index-url='https://tnt.autentia.com/nexus/repository/autentia-pypi/simple/'
+global.index='https://pypi.python.org/pypi/'
+global.index-url='https://pypi.python.org/simple/'
+global.trusted-host='tnt.autentia.com'
+```
+
+if this is not working, place the file in `~/.pip/pip.conf`
+
 To install or upgrade the TNTGitHook utility run the following command:
 
 ```bash
