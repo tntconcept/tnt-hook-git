@@ -15,7 +15,7 @@ To check if is already installed in your system you can try to run in the comman
 
 If you need to install them, both can be obtained from python.org or with [homebrew](https://brew.sh/) (recommended!): `brew install python3`
 
-Autentia private Nexus Pypi (package repository) must be added. Edit (or create if needed) the file `~/.config/pip.conf`
+Autentia private Nexus Pypi (package repository) must be added. Edit (or create if needed) the file `~/.config/pip/pip.conf`
 
 ```
 [global]
@@ -37,8 +37,6 @@ global.index='https://pypi.python.org/pypi/'
 global.index-url='https://pypi.python.org/simple/'
 global.trusted-host='tnt.autentia.com'
 ```
-
-if this is not working, place the file in `~/.pip/pip.conf`
 
 To install or upgrade the TNTGitHook utility run the following command:
 
