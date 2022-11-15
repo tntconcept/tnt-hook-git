@@ -18,3 +18,10 @@ def ask():
     except PasswordDeleteError:
         # We have already deleted old values, no true error so we can continue
         pass
+
+    print("IMPORTANT!!!: Secrets stored in the macOS Keychain are accessible with no prompt to any Python script.")
+    print("This access can be manually revoked (at the cost of manually confirming access each run), following next steps:")
+    print("1- Open Keychain Access")
+    print("2- Search com.autentia.TNTGitHook")
+    print("3- Open it an click on 'Access Control'")
+    print("4- Delete entry 'Python'")
