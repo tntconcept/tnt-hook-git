@@ -55,6 +55,24 @@ python3 -m TNTGitHook --set-credentials
 
 Credentials will be secured using system APIs, keychain in macOS, several options on Linux depending on desktop, and whatever security Windows may have. Check https://pypi.org/project/keyring/ for more detail
 
+**VERY IMPORTANT!!**: Secrets stored in the macOS Keychain are accessible with no prompt to any Python script.
+
+This access can be manually revoked (at the cost of manually confirming access each run), following next steps:
+1. Open Keychain Access
+
+![Keychain image](https://github.com/autentia/tnt-hook-git/resources/keichain.png "Keychain image")
+
+2. Search com.autentia.TNTGitHook
+
+![Searching com.autentia.TNTGitHook image](https://github.com/autentia/tnt-hook-git/resources/search.png "Searching com.autentia.TNTGitHook image")
+
+3. Open it an click on 'Access Control'
+
+![Access Control image](https://github.com/autentia/tnt-hook-git/resources/access-control.png "Access control image")
+
+4. Delete entry 'Python' and click on 'Save Changes'
+
+![Delete entry image](https://github.com/autentia/tnt-hook-git/resources/delete-entry.png "Delete entry image")
 
 ### Usage
 
