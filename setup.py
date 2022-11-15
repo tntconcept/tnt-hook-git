@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="TNTGitHook",
-    version="0.6.1",
+    version="0.7.0",
     author="Autentia",
     author_email="info@autentia.com",
     description="Utility to auto impute activities in TNT",
@@ -20,7 +20,7 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     python_requires='>=3.6',
-    install_requires=['requests==2.26.0', 'keyring==23.1.0'],
+    install_requires=['requests==2.26.0', 'keyring==23.11.0'],
     scripts=["bin/TNTGitHook"],
     package_data={
         "TNTGitHook": ["misc/tnt_git_hook.sh"]
