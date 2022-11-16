@@ -15,7 +15,7 @@ import stat
 
 from TNTGitHook.entities import *
 from TNTGitHook.exceptions import NoCredentialsError, AuthError, NotFoundError, NetworkError
-from TNTGitHook.utils import DateTimeEncoder, first, to_class
+from TNTGitHook.utils import DateTimeEncoder, first, to_class, formatRemoteURL
 
 NAME: str = "TNTGitHook"
 DEFAULT_CONFIG_FILE_PATH: str = f".git/hooks/{NAME}Config.json"
@@ -247,6 +247,7 @@ def generate_info(commit_msgs: str,
                   existing_activity: Activity = None,
                   remote_url: str = None) -> (str, datetime):
     prefix = PrjConfig.activity_prefix()
+    remote_url = formatRemoteURL(remote_url)
 
     def msg_parser(msg: str) -> Tuple[str, str, str, str]:
         if msg.count(";") != 3:
