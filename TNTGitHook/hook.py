@@ -162,9 +162,9 @@ def parse_activities(response_body) -> List[Activity]:
 def find_automatic_evidence(prjConfig: PrjConfig, activities: List[Activity]) -> Activity:
     prefix = prjConfig.activity_prefix()
     for activity in activities:
-        if prefix in activity.description and\
-                prjConfig.organization == activity.organization.name and\
-                prjConfig.project == activity.project.name and\
+        if prefix in activity.description and \
+                prjConfig.organization == activity.organization.name and \
+                prjConfig.project == activity.project.name and \
                 prjConfig.role == activity.projectRole.name:
             return activity
 
@@ -246,8 +246,6 @@ def check_organization_exists(config, headers, organization_name):
 def generate_info(commit_msgs: str,
                   existing_activity: Activity = None,
                   remote_url: str = None) -> (str, datetime):
-    prefix = PrjConfig.activity_prefix()
-
     def msg_parser(msg: str) -> Tuple[str, str, str, str]:
         if msg.count(";") != 3:
             return "", "", "", ""
@@ -260,7 +258,56 @@ def generate_info(commit_msgs: str,
     start_date: datetime = datetime.now().replace(hour=5, minute=0, second=0, microsecond=0, tzinfo=None)
 
     remote_url = "" if remote_url is None else remote_url + "\n"
-    result_str: str = prefix + "\n"
+    result_str: str = ""
+
+    if remote_url is not None and existing_activity is not None:
+        remoteURLIsNew = existing_activity.description.find(remote_url) == -1
+        if remoteURLIsNew:
+            result_str = add_new_evidence(existing_activity, msgs, remote_url)
+        if not remoteURLIsNew:
+            result_str = update_existing_evidence(existing_activity, msgs, remote_url)
+
+    else:
+        result_str = add_evidence_with_no_remote_url(existing_activity, msgs, remote_url)
+
+    # Truncate description gracefully if description buffer overflows
+    result_str = (result_str[:TNT_DESCRIPTION_MAX_SIZE] + '\n...') if len(result_str) > TNT_DESCRIPTION_MAX_SIZE else result_str
+
+    return result_str, start_date
+
+
+def update_existing_evidence(existing_activity, msgs, remote_url):
+    selectedDescriptionPointer: int = 0
+    descriptions = ("\n" + existing_activity.description).split("\n###Autocreated evidence###\n(DO NOT DELETE)\n")
+
+    for description in descriptions:
+        if description.find(remote_url) != -1:
+            break
+        selectedDescriptionPointer += 1
+    result_str = descriptions[selectedDescriptionPointer] + "\n-----\n"
+    result_str += "\n-----\n".join(map(lambda m: "\n".join(m), msgs))
+    descriptions[selectedDescriptionPointer] = result_str
+
+    pointer = 0
+    for description in descriptions:
+        if description != "":
+            if pointer == 1:
+                result_str = "###Autocreated evidence###\n(DO NOT DELETE)\n" + description
+            else:
+                result_str += "\n###Autocreated evidence###\n(DO NOT DELETE)\n" + description
+        pointer += 1
+
+    return result_str
+
+
+def add_new_evidence(existing_activity, msgs, remote_url):
+    result_str = existing_activity.description
+    result_str += "\n###Autocreated evidence###\n(DO NOT DELETE)\n" + remote_url
+    result_str += "\n-----\n".join(map(lambda m: "\n".join(m), msgs))
+    return result_str
+
+def add_evidence_with_no_remote_url(existing_activity, msgs, remote_url):
+    result_str = PrjConfig.activity_prefix() + "\n"
     previous_descriptions: str = ""
     if existing_activity is not None:
         previous_descriptions = existing_activity.description \
@@ -270,8 +317,4 @@ def generate_info(commit_msgs: str,
     result_str += remote_url
     result_str += previous_descriptions
     result_str += "\n-----\n".join(map(lambda m: "\n".join(m), msgs))
-
-    # Truncate description gracefully if description buffer overflows
-    result_str = (result_str[:TNT_DESCRIPTION_MAX_SIZE] + '\n...') if len(result_str) > TNT_DESCRIPTION_MAX_SIZE else result_str
-
-    return result_str, start_date
+    return result_str

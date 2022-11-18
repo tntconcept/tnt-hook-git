@@ -1,0 +1,200 @@
+[
+  {
+    "date": "2021-05-27",
+    "workedMinutes": 630,
+    "activities": [
+      {
+        "id": 252924,
+        "startDate": "2021-05-27T05:00:00",
+        "duration": 0,
+        "description": "###Autocreated evidence###\n(DO NOT DELETE)\ngit@gitlab.com:autentia/internal/tnt-hook-git.git\n9059fd879905a5b9113ead41b39ed4ccfe4cfca7\n2021-05-27T18:29:41+02:00\nYair Segura <ysegura@autentia.com>\n[FIX]: incorrect script reference\n-----\n557cfcb2fa30468d24264d8b1e835105e7298b3b\n2021-05-27T18:34:27+02:00\nYair Segura <ysegura@autentia.com>\nRemoved unused import\n-----\n9059fd879905a5b9113ead41b39ed4ccfe4cfca7\n2021-05-27T18:29:41+02:00\nYair Segura <ysegura@autentia.com>\n[FIX]: incorrect script reference\n-----\n557cfcb2fa30468d24264d8b1e835105e7298b3b\n2021-05-27T18:34:27+02:00\nYair Segura <ysegura@autentia.com>\nRemoved unused import\n-----\n1ed1c94437a714f02c220a3043dc97d2c625589a\n2021-05-27T18:39:06+02:00\nYair Segura <ysegura@autentia.com>\n[FIX]: fixed pre-push script\n-----\n9059fd879905a5b9113ead41b39ed4ccfe4cfca7\n2021-05-27T18:29:41+02:00\nYair Segura <ysegura@autentia.com>\n[FIX]: incorrect script reference\n-----\n557cfcb2fa30468d24264d8b1e835105e7298b3b\n2021-05-27T18:34:27+02:00\nYair Segura <ysegura@autentia.com>\nRemoved unused import\n-----\n1ed1c94437a714f02c220a3043dc97d2c625589a\n2021-05-27T18:39:06+02:00\nYair Segura <ysegura@autentia.com>\n[FIX]: fixed pre-push script\n-----\n9059fd879905a5b9113ead41b39ed4ccfe4cfca7\n2021-05-27T18:29:41+02:00\nYair Segura <ysegura@autentia.com>\n[FIX]: incorrect script reference\n-----\n557cfcb2fa30468d24264d8b1e835105e7298b3b\n2021-05-27T18:34:27+02:00\nYair Segura <ysegura@autentia.com>\nRemoved unused import\n-----\n1ed1c94437a714f02c220a3043dc97d2c625589a\n2021-05-27T18:39:06+02:00\nYair Segura <ysegura@autentia.com>\n[FIX]: fixed pre-push script\n###Autocreated evidence###\n(DO NOT DELETE)\nhttps://****:****@github.com/user/dummy.git\n79ad7cedb8b2a7085c9203a42d4b9101b4634dc6\n2021-05-07T13:48:22+02:00\nUSER <commiter2@autentia.com>\nAnother commit\n-----\nb287b94c4fdcccc426f828bd5e15e62139e0223f\n2020-05-27T13:20:21+02:00\nUSER <commiter1@autentia.com>\nInitial commit",
+        "projectRole": {
+          "id": 30,
+          "name": "desarrollo",
+          "requireEvidence": true
+        },
+        "userId": 93,
+        "billable": false,
+        "organization": {
+          "id": 3,
+          "name": "Autentia Real Business Solutions S.L."
+        },
+        "project": {
+          "id": 68,
+          "name": "i+d - Desarrollos de Software Interno",
+          "open": true,
+          "billable": false
+        },
+        "hasImage": false
+      },
+      {
+        "id": 253129,
+        "startDate": "2021-05-27T09:30:00",
+        "duration": 150,
+        "description": "- Preparación cuestionario para fase Descubrimiento",
+        "projectRole": {
+          "id": 1811,
+          "name": "Senior Architect/Senior Coach",
+          "requireEvidence": false
+        },
+        "userId": 93,
+        "billable": true,
+        "organization": {
+          "id": 1407,
+          "name": "THINKING WITH YOU DRIA S.L"
+        },
+        "project": {
+          "id": 1521,
+          "name": "Mapfre - Potenciación de equipos ágiles",
+          "open": true,
+          "billable": true
+        },
+        "hasImage": false
+      },
+      {
+        "id": 253122,
+        "startDate": "2021-05-27T12:00:00",
+        "duration": 120,
+        "description": "- Sprint Review #26 NSE Colectivos (NSEc)",
+        "projectRole": {
+          "id": 1811,
+          "name": "Senior Architect/Senior Coach",
+          "requireEvidence": false
+        },
+        "userId": 93,
+        "billable": true,
+        "organization": {
+          "id": 1407,
+          "name": "THINKING WITH YOU DRIA S.L"
+        },
+        "project": {
+          "id": 1521,
+          "name": "Mapfre - Potenciación de equipos ágiles",
+          "open": true,
+          "billable": true
+        },
+        "hasImage": false
+      },
+      {
+        "id": 253126,
+        "startDate": "2021-05-27T14:00:00",
+        "duration": 135,
+        "description": "- Sprint 26 Retrospective NSEc",
+        "projectRole": {
+          "id": 1811,
+          "name": "Senior Architect/Senior Coach",
+          "requireEvidence": false
+        },
+        "userId": 93,
+        "billable": true,
+        "organization": {
+          "id": 1407,
+          "name": "THINKING WITH YOU DRIA S.L"
+        },
+        "project": {
+          "id": 1521,
+          "name": "Mapfre - Potenciación de equipos ágiles",
+          "open": true,
+          "billable": true
+        },
+        "hasImage": false
+      },
+      {
+        "id": 253127,
+        "startDate": "2021-05-27T16:15:00",
+        "duration": 45,
+        "description": "- Reunión seguimiento con Antonio Crespo y Santiago de Blas",
+        "projectRole": {
+          "id": 1811,
+          "name": "Senior Architect/Senior Coach",
+          "requireEvidence": false
+        },
+        "userId": 93,
+        "billable": true,
+        "organization": {
+          "id": 1407,
+          "name": "THINKING WITH YOU DRIA S.L"
+        },
+        "project": {
+          "id": 1521,
+          "name": "Mapfre - Potenciación de equipos ágiles",
+          "open": true,
+          "billable": true
+        },
+        "hasImage": false
+      },
+      {
+        "id": 253128,
+        "startDate": "2021-05-27T17:00:00",
+        "duration": 30,
+        "description": "- Reunión de seguimiento con PlainConcepts",
+        "projectRole": {
+          "id": 1794,
+          "name": "Consultor",
+          "requireEvidence": false
+        },
+        "userId": 93,
+        "billable": true,
+        "organization": {
+          "id": 1777,
+          "name": "Dominion Global"
+        },
+        "project": {
+          "id": 1516,
+          "name": "Auditoría metodológica y de calidad de procesos",
+          "open": true,
+          "billable": true
+        },
+        "hasImage": false
+      },
+      {
+        "id": 253114,
+        "startDate": "2021-05-27T17:30:00",
+        "duration": 120,
+        "description": "- Desarrollo TNTGitHook",
+        "projectRole": {
+          "id": 30,
+          "name": "desarrollo",
+          "requireEvidence": true
+        },
+        "userId": 93,
+        "billable": false,
+        "organization": {
+          "id": 3,
+          "name": "Autentia Real Business Solutions S.L."
+        },
+        "project": {
+          "id": 68,
+          "name": "i+d - Desarrollos de Software Interno",
+          "open": true,
+          "billable": false
+        },
+        "hasImage": false
+      },
+      {
+        "id": 253130,
+        "startDate": "2021-05-27T19:30:00",
+        "duration": 30,
+        "description": "- Reunión seguimiento y próximos pasos con Jose María Toribio",
+        "projectRole": {
+          "id": 1770,
+          "name": "Consultor",
+          "requireEvidence": true
+        },
+        "userId": 93,
+        "billable": true,
+        "organization": {
+          "id": 1431,
+          "name": "IATA ESPAÑA SL"
+        },
+        "project": {
+          "id": 1500,
+          "name": "Wallets for Airlines - Analysis",
+          "open": true,
+          "billable": true
+        },
+        "hasImage": false
+      }
+    ]
+  }
+]
