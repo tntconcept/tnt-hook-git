@@ -1,4 +1,5 @@
 import json
+import re
 from datetime import datetime
 from typing import Any, Iterable, Callable, TypeVar
 
@@ -35,3 +36,23 @@ def first(function: Callable[[T], bool], iterable: Iterable[T]) -> T:
     for item in iterable:
         if function(item):
             return item
+
+def formatRemoteURL(remoteURL) -> str:
+
+    userPattern = "\/+\w.*\:"
+    tokenPattern = "\:+([\w\d]*)@"
+
+    if(remoteURL is None):
+        return remoteURL
+
+    user = re.search(userPattern, remoteURL)
+
+    if(user is None):
+        return remoteURL
+
+    user = user.group(0)
+    formattedURL = re.sub(user, "//****:", remoteURL)
+    token = re.search(tokenPattern, formattedURL).group(1)
+    formattedURL = re.sub(token, "****", formattedURL)
+
+    return formattedURL

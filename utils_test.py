@@ -1,6 +1,6 @@
 import unittest
 from TNTGitHook.hook import parse_activities
-from TNTGitHook.utils import DateTimeEncoder, OrganizationListDecoder, to_class
+from TNTGitHook.utils import DateTimeEncoder, OrganizationListDecoder, to_class, formatRemoteURL
 from datetime import datetime
 from typing import List
 from TNTGitHook.entities import ActivitiesResponse, Activity
@@ -29,6 +29,18 @@ class UtilsTestCase(unittest.TestCase):
             self.assertIsNotNone(activity.project)
             self.assertIsNotNone(activity.organization)
             self.assertIsNotNone(activity.projectRole)
+
+    def test_replace_user_and_token_when_remote_url_contains_them(self):
+        remoteURL = "https://nassr.mousati:ghp_LuToBb2F@github.com/user/dummy.git"
+        expectedRemoteURL = "https://****:****@github.com/user/dummy.git"
+        formatedRemoteURL = formatRemoteURL(remoteURL)
+        self.assertEqual(formatedRemoteURL, expectedRemoteURL)
+
+    def test_do_nothing_when_remote_utl_does_not_contain_user_and_token(self):
+        remoteURL = "https://github.com/ifernandezautentia/dummy.git"
+        expectedRemoteURL = remoteURL
+        formatedRemoteURL = formatRemoteURL(remoteURL)
+        self.assertEqual(formatedRemoteURL, expectedRemoteURL)
 
 
 if __name__ == '__main__':
