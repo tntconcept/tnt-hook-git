@@ -25,6 +25,7 @@ class HookTestCase(unittest.TestCase):
     fake_auth_token: str
     fake_activities: List[Activity]
     other_activities: List[Activity]
+    other_activities_with_several_repos: List[Activity]
     organizationA: Organization
     organizationB: Organization
     fake_organizations: str
@@ -232,6 +233,28 @@ class HookTestCase(unittest.TestCase):
         self.assertIsNotNone(info)
         self.assertRegex(info[0], r'(^###Autocreated evidence###\n\(DO NOT DELETE\)\n)')
 
+    def test_should_add_new_section_when_is_a_new_repository(self):
+        prjConfig = PrjConfig()
+        prjConfig.organization = "Autentia Real Business Solutions S.L."
+        prjConfig.project = "i+d - Desarrollos de Software Interno"
+        prjConfig.role = "desarrollo"
+        evidence = find_automatic_evidence(prjConfig, self.other_activities)
+        info = generate_info(self.commit_messages, evidence, "https://ifernandezautentia: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@github.com/ifernandezautentia/dummy-2.git")
+        print(info[0])
+        self.assertIsNotNone(info)
+        self.assertRegex(info[0], r'(^###Autocreated evidence###\n\(DO NOT DELETE\)\n)')
+
+    def test_generate_info_with_several_remoteURLs(self):
+        prjConfig = PrjConfig()
+        prjConfig.organization = "Autentia Real Business Solutions S.L."
+        prjConfig.project = "i+d - Desarrollos de Software Interno"
+        prjConfig.role = "desarrollo"
+        evidence = find_automatic_evidence(prjConfig, self.other_activities_with_several_repos)
+        info = generate_info(self.commit_messages, evidence, "https://****:****@github.com/user/dummy.git")
+        print(info[0])
+        self.assertIsNotNone(info)
+        self.assertRegex(info[0], r'(^###Autocreated evidence###\n\(DO NOT DELETE\)\n)')
+
     def get_regex(self) -> str:
         header = r'(^###Autocreated evidence###\n\(DO NOT DELETE\)\n){1}'
         sha = r'([\da-f]{40}\n)'
@@ -266,6 +289,10 @@ class HookTestCase(unittest.TestCase):
         with open('other_activities.json') as other_activities:
             data = other_activities.read()
         self.other_activities = parse_activities(data)
+
+        with open('other_activities_with_several_repos.json') as other_activities_with_several_repos:
+            data = other_activities_with_several_repos.read()
+        self.other_activities_with_several_repos = parse_activities(data)
 
         self.organizationA = Organization().with_id(0).with_name("Test Organization")
         self.organizationB = Organization().with_id(1).with_name("Another Organization")
