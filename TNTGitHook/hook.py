@@ -260,7 +260,7 @@ def generate_info(commit_msgs: str,
 
     remote_url = "" if remote_url is None else remote_url + "\n"
     result_str: str = ""
-
+    remote_url = formatRemoteURL(remote_url)
     if remote_url is not None and existing_activity is not None:
         remoteURLIsNew = existing_activity.description.find(remote_url) == -1
         if remoteURLIsNew:
