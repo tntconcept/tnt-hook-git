@@ -86,6 +86,18 @@ python3 -m TNTGitHook --setup
 
 It will prompt you for the organization, project and role names (they must match exactly with the ones on TNT, otherwise tool will complain).
 
+If you don't want the prompt for each command due:
+- To having several repositories to manage.
+- Want to use the setup in a script.
+
+Can use the following command instead that will not require any prompt to do the setup:
+
+**This configuration is per git repository!**
+
+```bash
+python3 -m TNTGitHook --setup --organization "ORGANIZATION" --project "PROJECT" --role "ROLE"
+```
+
 
 ### Manual Setup
 
@@ -173,7 +185,7 @@ And give it execution permission:
 ```bash
 chmod +x /usr/local/bin/tnt_git_hook.sh
 ```
-### Build release 
+### Build release
 
 To build Pypi, modify setup.py accordingly (versions, name, etc) package.
 Verify that you don't have old execution folders:

@@ -25,12 +25,10 @@ def write_hook():
     write_hook_script()
     print("Hook written")
 
-
-def setup(config: Config):
+def setup(config: Config, organization:str, project: str, role: str):
     write_hook_script()
     write_pre_push_script()
-    setup_config(config)
-
+    setup_config(config, organization, project, role)
 
 def write_pre_push_script():
     pre_push = PrePush()
