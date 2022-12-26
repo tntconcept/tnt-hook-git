@@ -22,6 +22,11 @@ def main(argv=None):
     parser.add_argument('--remote', help="Remote repo URL", required=False)
     parser.add_argument('--config', help="Config file", required=False)
 
+    parser.add_argument('--organization', help="For setup: The organization. By default require input", required=False, default="")
+    parser.add_argument('--project', help="For setup: The project. By default require input", required=False, default="")
+    parser.add_argument('--role', help="For setup: The role. By default require input", required=False, default="")
+
+
     args = parser.parse_args()
     config = Config.config(args.debug)
 
@@ -30,7 +35,7 @@ def main(argv=None):
         return
 
     if args.setup:
-        setup(config)
+        setup(config, args.organization, args.project, args.role)
         return
 
     config_file = args.config or DEFAULT_CONFIG_FILE_PATH

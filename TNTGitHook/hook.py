@@ -58,12 +58,21 @@ class PrjConfig:
         return "###Autocreated evidence###\n(DO NOT DELETE)"
 
 
-def setup_config(config):
+def setup_config(config:Config, selected_organization:str, selected_project:str, selected_role:str):
+    if selected_organization == "":
+        selected_organization = input("Organization: ")
+
+    if selected_project == "":
+        selected_project = input("Project: ")
+
+    if selected_role == "":
+        selected_role = input("Role: ")
+
     try:
         headers = generate_request_headers(config)
-        organization = check_organization_exists(config, headers, input("Organization: "))
-        project = check_project_exists(config, headers, organization, input("Project: "))
-        role = check_role_exists(config, headers, project, input("Role: "))
+        organization = check_organization_exists(config, headers, selected_organization)
+        project = check_project_exists(config, headers, organization, selected_project)
+        role = check_role_exists(config, headers, project, selected_role)
 
         path = DEFAULT_CONFIG_FILE_PATH
         prj_config = PrjConfig()
