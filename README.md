@@ -168,9 +168,10 @@ then
     exit 0
   fi
 
+  GITLOGFILECONTENT=$(<$FILENAME)
   REMOTE=$(git ls-remote --get-url | head -1)
 
-  if ! python3 -m TNTGitHook --commit-msgs-file $FILENAME --remote $REMOTE;
+  if ! python3 -m TNTGitHook --commit-msgs "$GITLOGFILECONTENT" --remote $REMOTE;
   then
     echo "Error executing python hook"
     exit 1
