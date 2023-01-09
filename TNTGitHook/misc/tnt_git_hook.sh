@@ -32,6 +32,7 @@ then
     cd $CURRENT_PATH || exit 0
     exit 0
   fi
+  sync -d $FILENAME
 
   REMOTE=$(git ls-remote --get-url | head -1)
 
