@@ -14,7 +14,7 @@ from requests import Response
 import stat
 
 from TNTGitHook.entities import *
-from TNTGitHook.exceptions import NoCredentialsError, AuthError, NotFoundError, NetworkError
+from TNTGitHook.exceptions import NoCredentialsError, AuthError, NotFoundError, NetworkError, EmptyCommitMessages
 from TNTGitHook.utils import DateTimeEncoder, first, to_class, formatRemoteURL
 
 NAME: str = "TNTGitHook"
@@ -120,6 +120,9 @@ def create_activity(config: Config,
     project_name = prj_config.project
     role_name = prj_config.role
     billable = False
+
+    if len(commit_msgs) == 0:
+        raise EmptyCommitMessages()
 
     headers = generate_request_headers(config)
 

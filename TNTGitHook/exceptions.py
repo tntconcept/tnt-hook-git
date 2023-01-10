@@ -30,3 +30,8 @@ class NotFoundError(Exception):
 
     def __str__(self):
         return self.item + " with name \"" + self.value + "\" not found in TNT"
+
+
+class EmptyCommitMessages(Exception):
+    def __str__(self):
+        return "Empty commit messages. It may be produced due to a temporary error. Please try again"
