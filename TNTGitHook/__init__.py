@@ -43,6 +43,7 @@ def main(argv=None):
     config_file = args.config or DEFAULT_CONFIG_FILE_PATH
     try:
         commit_msgs = args.commit_msgs if parse_commit_messages(args.commit_msgs) else parse_commit_messages_from_file(args.commit_msgs_file)
+
         with open(config_file) as config_file:
             prj_config: PrjConfig = json.load(config_file, object_hook=lambda x: to_class(x, PrjConfig))
             config.timeout = prj_config.timeout
@@ -51,7 +52,7 @@ def main(argv=None):
                 write_hook()
 
             try:
-                create_activity(config, prj_config, parse_commit_messages(commit_msgs), args.remote)
+                create_activity(config, prj_config, commit_msgs, args.remote)
             except requests.exceptions.RequestException as error:
                 print("Timeout generating activity due to request error, continue with the push")
                 print(error)
