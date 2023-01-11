@@ -32,6 +32,35 @@ class NotFoundError(Exception):
         return self.item + " with name \"" + self.value + "\" not found in TNT"
 
 
-class EmptyCommitMessages(Exception):
+class CommitMessagesFileNotFoundError(Exception):
+    path: str
+    path_write_permissions: bool
+
+    def __init__(self, path: str, path_write_permissions: bool):
+        self.path = path
+        self.path_write_permissions = path_write_permissions
+
     def __str__(self):
-        return "Empty commit messages. It may be produced due to a temporary error. Please try again"
+        return f"Commits messages file not found. File data: path={self.path}, path_write_permissions={self.path_write_permissions}"
+
+
+class EmptyCommitMessagesFileError(Exception):
+    path: str
+    path_write_permissions: bool
+    file_permissions: str
+    file_last_access_time: str
+    file_last_modification_time: str
+    file_ctime: str
+
+    def __init__(self, path: str, path_write_permissions: bool, file_permissions: str, file_last_access_time: str, file_last_modification_time: str, file_ctime: str):
+        self.path = path
+        self.path_write_permissions = path_write_permissions
+        self.file_permissions = file_permissions
+        self.file_last_access_time = file_last_access_time
+        self.file_last_modification_time = file_last_modification_time
+        self.file_ctime = file_ctime
+
+    def __str__(self):
+        return f"File data: path={self.path}, path_write_permissions={self.path_write_permissions}, " \
+               f"file_permissions={self.file_permissions}, file_last_access_time={self.file_last_access_time}, " \
+               f"file_last_modification_time={self.file_last_modification_time}, file_ctime={self.file_ctime}"

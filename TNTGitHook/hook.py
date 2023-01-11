@@ -14,7 +14,7 @@ from requests import Response
 import stat
 
 from TNTGitHook.entities import *
-from TNTGitHook.exceptions import NoCredentialsError, AuthError, NotFoundError, NetworkError, EmptyCommitMessages
+from TNTGitHook.exceptions import NoCredentialsError, AuthError, NotFoundError, NetworkError, EmptyCommitMessagesFileError, CommitMessagesFileNotFoundError
 from TNTGitHook.utils import DateTimeEncoder, first, to_class, formatRemoteURL
 
 NAME: str = "TNTGitHook"
@@ -108,8 +108,15 @@ def get_hook_sha1():
 
 
 def read_commit_msgs(file: str):
-    with open(file) as f:
-        return f.read().strip()
+    print("hola")
+    file_path = os.path.dirname("/tmp")
+    try:
+        f = open("kk")
+    except OSError:
+        raise CommitMessagesFileNotFoundError(file, os.access(file_path, os.W_OK))
+    with f:
+        file_content = f.read().strip()
+        return file_content
 
 
 def create_activity(config: Config,
@@ -122,7 +129,7 @@ def create_activity(config: Config,
     billable = False
 
     if not commit_msgs:
-        raise EmptyCommitMessages()
+        raise EmptyCommitMessagesFileError()
 
     headers = generate_request_headers(config)
 
