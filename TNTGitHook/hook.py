@@ -112,7 +112,7 @@ def read_commit_msgs(file: str):
     file_path = os.path.dirname("/tmp")
     try:
         f = open("kk")
-    except OSError:
+    except FileNotFoundError:
         raise CommitMessagesFileNotFoundError(file, os.access(file_path, os.W_OK))
     with f:
         file_content = f.read().strip()
