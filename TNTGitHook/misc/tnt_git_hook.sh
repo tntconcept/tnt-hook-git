@@ -9,7 +9,6 @@ project_path=$5
 
 if [ -z "$local_sha" ] || [ -z "$remote_sha" ] || [ $((16#$local_sha)) -eq 0 ]
 then
-  echo "Precondition failed: hook won't be executed"
   exit 0
 fi
 
