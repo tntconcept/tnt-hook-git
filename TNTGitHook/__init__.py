@@ -58,13 +58,13 @@ def main(argv=None):
                 print(error)
                 exit(0)
             except Exception as error:
-                print("Could not register activity on TNT due to some errors:")
+                print("HolaCould not register activity on TNT due to some errors:")
                 print(error)
 
                 if not prj_config.ignore_errors:
                     exit(-1)
 
     except Exception as error:
-        print("Could not register activity on TNT due to some errors:")
+        print("YepCould not register activity on TNT due to some errors:")
         print(error)
         exit(-1)
