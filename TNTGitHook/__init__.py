@@ -44,8 +44,8 @@ def main(argv=None):
 
     config_file = args.config or DEFAULT_CONFIG_FILE_PATH
     try:
-        commit_msgs: [Tuple[str, str, datetime, str]] = parse_commit_messages(args.commit_msgs) if args.commit_msgs else parse_commit_messages_from_file(args.commit_msgs_file)
-        print(commit_msgs)
+        commit_msgs = parse_commit_messages(args.commit_msgs) if args.commit_msgs else parse_commit_messages_from_file(args.commit_msgs_file)
+
         with open(config_file) as config_file:
             prj_config: PrjConfig = json.load(config_file, object_hook=lambda x: to_class(x, PrjConfig))
             config.timeout = prj_config.timeout
