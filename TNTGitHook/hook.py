@@ -264,7 +264,7 @@ def parse_commit_messages(commit_msgs: str):
         if msg.count(";") != 3:
             return "", "", "", ""
         items = msg.split(";")
-        if len(items) != 4:
+        if len(items) == 4:
             raise CommitMessageFormatError()
         return items[0], items[1], items[2], items[3]
 
