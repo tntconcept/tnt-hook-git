@@ -274,7 +274,7 @@ def parse_commit_messages(commit_msgs: str):
 
 
 def parse_commit_messages_from_file(commit_msgs_file: str):
-    commit_msgs = read_commit_msgs(commit_msgs_file)
+    commit_msgs: str = read_commit_msgs(commit_msgs_file)
     try:
         return parse_commit_messages(commit_msgs)
     except Exception:
