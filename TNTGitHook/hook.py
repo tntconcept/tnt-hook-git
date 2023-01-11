@@ -110,7 +110,7 @@ def get_hook_sha1():
 def read_commit_msgs(file: str):
     file_path = os.path.dirname(file)
     try:
-        f = open("kk")
+        f = open(file)
     except FileNotFoundError:
         raise CommitMessagesFileNotFoundError(file, os.access(file_path, os.W_OK))
     with f:
