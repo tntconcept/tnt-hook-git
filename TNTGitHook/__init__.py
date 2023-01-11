@@ -39,9 +39,8 @@ def main(argv=None):
         return
 
     config_file = args.config or DEFAULT_CONFIG_FILE_PATH
-
-    commit_msgs = args.commit_msgs if args.commit_msgs else read_commit_msgs(args.commit_msgs_file)
     try:
+        commit_msgs = args.commit_msgs if args.commit_msgs else read_commit_msgs(args.commit_msgs_file)
         with open(config_file) as config_file:
             prj_config: PrjConfig = json.load(config_file, object_hook=lambda x: to_class(x, PrjConfig))
             config.timeout = prj_config.timeout
