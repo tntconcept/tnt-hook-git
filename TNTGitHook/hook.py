@@ -121,7 +121,7 @@ def create_activity(config: Config,
     role_name = prj_config.role
     billable = False
 
-    if len(commit_msgs) == 0:
+    if not commit_msgs:
         raise EmptyCommitMessages()
 
     headers = generate_request_headers(config)
