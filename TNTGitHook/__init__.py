@@ -1,13 +1,15 @@
 import argparse
+import datetime
 import json
+from typing import Tuple
 
 import requests
 
 from TNTGitHook.credentials import ask
+from TNTGitHook.exceptions import CommitMessageFormatError
 from TNTGitHook.hook import Config, PrjConfig, DEFAULT_CONFIG_FILE_PATH, NAME, read_commit_msgs, \
     parse_commit_messages, create_activity, parse_commit_messages_from_file
 from TNTGitHook.hook_setup import is_update_needed, write_hook, setup
-from TNTGitHook.exceptions import CommitMessageFormatError
 from TNTGitHook.utils import to_class
 
 
@@ -42,7 +44,7 @@ def main(argv=None):
 
     config_file = args.config or DEFAULT_CONFIG_FILE_PATH
     try:
-        commit_msgs = args.commit_msgs if parse_commit_messages(args.commit_msgs) else parse_commit_messages_from_file(args.commit_msgs_file)
+        commit_msgs: [Tuple[str, str, datetime, str]] = args.commit_msgs if parse_commit_messages(args.commit_msgs) else parse_commit_messages_from_file(args.commit_msgs_file)
 
         with open(config_file) as config_file:
             prj_config: PrjConfig = json.load(config_file, object_hook=lambda x: to_class(x, PrjConfig))
@@ -58,13 +60,13 @@ def main(argv=None):
                 print(error)
                 exit(0)
             except Exception as error:
-                print("HolaCould not register activity on TNT due to some errors:")
+                print(" Could not register activity on TNT due to some errors:")
                 print(error)
 
                 if not prj_config.ignore_errors:
                     exit(-1)
 
     except Exception as error:
-        print("YepCould not register activity on TNT due to some errors:")
+        print("Could not register activity on TNT due to some errors:")
         print(error)
         exit(-1)
