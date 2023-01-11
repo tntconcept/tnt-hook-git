@@ -1,3 +1,5 @@
+from TNTGitHook.entities import FileInfo
+
 
 class NoCredentialsError(Exception):
     def __str__(self):
@@ -45,22 +47,12 @@ class CommitMessagesFileNotFoundError(Exception):
 
 
 class EmptyCommitMessagesFileError(Exception):
-    path: str
-    path_write_permissions: bool
-    file_permissions: str
-    file_last_access_time: str
-    file_last_modification_time: str
-    file_ctime: str
+    file_info: FileInfo
 
-    def __init__(self, path: str, path_write_permissions: bool, file_permissions: str, file_last_access_time: str, file_last_modification_time: str, file_ctime: str):
-        self.path = path
-        self.path_write_permissions = path_write_permissions
-        self.file_permissions = file_permissions
-        self.file_last_access_time = file_last_access_time
-        self.file_last_modification_time = file_last_modification_time
-        self.file_ctime = file_ctime
+    def __init__(self, file_info: FileInfo):
+        self.file_info = file_info
 
     def __str__(self):
-        return f"File data: path={self.path}, path_write_permissions={self.path_write_permissions}, " \
-               f"file_permissions={self.file_permissions}, file_last_access_time={self.file_last_access_time}, " \
-               f"file_last_modification_time={self.file_last_modification_time}, file_ctime={self.file_ctime}"
+        return f"File data: path={self.file_info.path}, path_write_permissions={self.file_info.path_write_permissions}, " \
+               f"file_permissions={self.file_info.file_permissions}, file_last_access_time={self.file_info.file_last_access_time}, " \
+               f"file_last_modification_time={self.file_info.file_last_modification_time}, file_ctime={self.file_info.file_ctime}"

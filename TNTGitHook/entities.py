@@ -105,3 +105,12 @@ class CreateActivityRequest:
     description: str
     billable: bool
     projectRoleId: int
+
+
+class FileInfo:
+    path: str
+    path_write_permissions: bool
+    file_permissions: str
+    file_last_access_time: str
+    file_last_modification_time: str
+    file_ctime: str
