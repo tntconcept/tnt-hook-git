@@ -46,6 +46,11 @@ class CommitMessagesFileNotFoundError(Exception):
         return f"Commits messages file not found. File data: path={self.path}, path_write_permissions={self.path_write_permissions}"
 
 
+class CommitMessageFormatError(Exception):
+    def __str__(self):
+        return "Invalid commits messages file format"
+
+
 class EmptyCommitMessagesFileError(Exception):
     file_info: FileInfo
 
@@ -55,4 +60,5 @@ class EmptyCommitMessagesFileError(Exception):
     def __str__(self):
         return f"File data: path={self.file_info.path}, path_write_permissions={self.file_info.path_write_permissions}, " \
                f"file_permissions={self.file_info.file_permissions}, file_last_access_time={self.file_info.file_last_access_time}, " \
-               f"file_last_modification_time={self.file_info.file_last_modification_time}, file_ctime={self.file_info.file_ctime}"
+               f"file_last_modification_time={self.file_info.file_last_modification_time}, file_ctime={self.file_info.file_ctime}," \
+               f"file_content={self.file_info.file_content}"

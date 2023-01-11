@@ -114,3 +114,4 @@ class FileInfo:
     file_last_access_time: str
     file_last_modification_time: str
     file_ctime: str
+    file_content: str

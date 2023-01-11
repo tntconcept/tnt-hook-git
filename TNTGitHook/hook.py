@@ -14,7 +14,8 @@ from requests import Response
 import stat
 
 from TNTGitHook.entities import *
-from TNTGitHook.exceptions import NoCredentialsError, AuthError, NotFoundError, NetworkError, EmptyCommitMessagesFileError, CommitMessagesFileNotFoundError
+from TNTGitHook.exceptions import NoCredentialsError, AuthError, NotFoundError, NetworkError, \
+    CommitMessagesFileNotFoundError, CommitMessageFormatError, EmptyCommitMessagesFileError
 from TNTGitHook.utils import DateTimeEncoder, first, to_class, formatRemoteURL
 
 NAME: str = "TNTGitHook"
@@ -120,15 +121,12 @@ def read_commit_msgs(file: str):
 
 def create_activity(config: Config,
                     prj_config: PrjConfig,
-                    commit_msgs: str,
+                    commit_msgs: [Tuple[str, str, datetime, str]],
                     remote: str):
     organization_name = prj_config.organization
     project_name = prj_config.project
     role_name = prj_config.role
     billable = False
-
-    if not commit_msgs:
-        raise EmptyCommitMessagesFileError()
 
     headers = generate_request_headers(config)
 
@@ -261,18 +259,34 @@ def check_organization_exists(config, headers, organization_name):
     return organization
 
 
-def generate_info(commit_msgs: str,
-                  existing_activity: Activity = None,
-                  remote_url: str = None) -> (str, datetime):
-
+def parse_commit_messages(commit_msgs: str):
     def msg_parser(msg: str) -> Tuple[str, str, str, str]:
         if msg.count(";") != 3:
             return "", "", "", ""
         items = msg.split(";")
+        if len(items) != 4:
+            raise CommitMessageFormatError()
         return items[0], items[1], items[2], items[3]
 
     lines = filter(None, commit_msgs.split("\n")[::-1])
     msgs: [Tuple[str, str, datetime, str]] = list(map(msg_parser, lines))
+    return msgs
+
+
+def parse_commit_messages_from_file(commit_msgs_file: str):
+    commit_msgs = read_commit_msgs(commit_msgs_file)
+    try:
+        return parse_commit_messages(commit_msgs)
+    except Exception:
+        file_info: FileInfo = FileInfo()
+        file_info.file_content = commit_msgs
+        file_info.path = commit_msgs_file
+        file_info.path_write_permissions = os.access(commit_msgs_file, os.W_OK)
+        raise EmptyCommitMessagesFileError(file_info)
+
+def generate_info(commit_msgs: [Tuple[str, str, datetime, str]],
+                  existing_activity: Activity = None,
+                  remote_url: str = None) -> (str, datetime):
 
     start_date: datetime = datetime.now().replace(hour=5, minute=0, second=0, microsecond=0, tzinfo=None)
 
@@ -282,12 +296,12 @@ def generate_info(commit_msgs: str,
     if remote_url is not None and existing_activity is not None:
         remoteURLIsNew = existing_activity.description.find(remote_url) == -1
         if remoteURLIsNew:
-            result_str = add_new_evidence(existing_activity, msgs, remote_url)
+            result_str = add_new_evidence(existing_activity, commit_msgs, remote_url)
         if not remoteURLIsNew:
-            result_str = update_existing_evidence(existing_activity, msgs, remote_url)
+            result_str = update_existing_evidence(existing_activity, commit_msgs, remote_url)
 
     else:
-        result_str = add_evidence_with_no_remote_url(existing_activity, msgs, remote_url)
+        result_str = add_evidence_with_no_remote_url(existing_activity, commit_msgs, remote_url)
 
     # Truncate description gracefully if description buffer overflows
     result_str = (result_str[:TNT_DESCRIPTION_MAX_SIZE] + '\n...') if len(result_str) > TNT_DESCRIPTION_MAX_SIZE else result_str

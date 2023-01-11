@@ -13,7 +13,7 @@ from unittest.mock import patch, MagicMock
 import httpretty
 import warnings
 
-from TNTGitHook import hook
+from TNTGitHook import hook, parse_commit_messages
 from TNTGitHook.exceptions import AuthError, NotFoundError, NetworkError
 from TNTGitHook.hook import Config, find_automatic_evidence, PrjConfig, parse_activities, generate_info
 from TNTGitHook.entities import *
@@ -47,7 +47,7 @@ class HookTestCase(unittest.TestCase):
 
     def test_generated_info_order_should_be_from_recent_to_older(self):
         commits = hook.read_commit_msgs("new_branch_commits")
-        info = hook.generate_info(commits)
+        info = generate_info(parse_commit_messages(commits), None, None)
         print(info[0])
         self.assertRegex(
             info[0],
@@ -228,7 +228,7 @@ class HookTestCase(unittest.TestCase):
         prjConfig.project = "i+d - Desarrollos de Software Interno"
         prjConfig.role = "desarrollo"
         evidence = find_automatic_evidence(prjConfig, self.other_activities)
-        info = generate_info(self.commit_messages, evidence, "")
+        info = generate_info(parse_commit_messages(self.commit_messages), evidence, "")
         print(info[0])
         self.assertIsNotNone(info)
         self.assertRegex(info[0], r'(^###Autocreated evidence###\n\(DO NOT DELETE\)\n)')
@@ -239,7 +239,8 @@ class HookTestCase(unittest.TestCase):
         prjConfig.project = "i+d - Desarrollos de Software Interno"
         prjConfig.role = "desarrollo"
         evidence = find_automatic_evidence(prjConfig, self.other_activities)
-        info = generate_info(self.commit_messages, evidence, "https://ifernandezautentia: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@github.com/ifernandezautentia/dummy-2.git")
+        info = generate_info(parse_commit_messages(self.commit_messages), evidence,
+                              "https://ifernandezautentia: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@github.com/ifernandezautentia/dummy-2.git")
         print(info[0])
         self.assertIsNotNone(info)
         self.assertRegex(info[0], r'(^###Autocreated evidence###\n\(DO NOT DELETE\)\n)')
@@ -250,7 +251,8 @@ class HookTestCase(unittest.TestCase):
         prjConfig.project = "i+d - Desarrollos de Software Interno"
         prjConfig.role = "desarrollo"
         evidence = find_automatic_evidence(prjConfig, self.other_activities_with_several_repos)
-        info = generate_info(self.commit_messages, evidence, "https://****:****@github.com/user/dummy.git")
+        info = generate_info(parse_commit_messages(self.commit_messages), evidence,
+                              "https://****:****@github.com/user/dummy.git")
         print(info[0])
         self.assertIsNotNone(info)
         self.assertRegex(info[0], r'(^###Autocreated evidence###\n\(DO NOT DELETE\)\n)')
