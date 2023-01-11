@@ -9,8 +9,7 @@ project_path=$5
 
 if [ -z "$local_sha" ] || [ -z "$remote_sha" ] || [ $((16#$local_sha)) -eq 0 ]
 then
-  echo "Error executing python hook: invalid input parameters"
-  exit 1
+  exit 0
 fi
 
 pushd $project_path || exit 1
