@@ -284,6 +284,9 @@ class HookTestCase(unittest.TestCase):
         with open('new_branch_commits') as commits:
             self.commit_messages = commits.read()
 
+        with open('resources/invalid_branch_commits') as invalid_commits:
+            self.invalid_commits_messages = invalid_commits.read()
+
         with open('example_activities') as example_activities:
             data = example_activities.read()
         self.fake_activities = parse_activities(data)
