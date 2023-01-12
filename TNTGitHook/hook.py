@@ -6,6 +6,7 @@ import os
 import pkgutil
 from functools import reduce
 from typing import List, Tuple
+from datetime import datetime, timezone
 
 import keyring
 import requests
@@ -261,8 +262,6 @@ def check_organization_exists(config, headers, organization_name):
 
 def parse_commit_messages(commit_msgs: str):
     def msg_parser(msg: str) -> Tuple[str, str, str, str]:
-        if msg.count(";") != 3:
-            return "", "", "", ""
         items = msg.split(";")
         if len(items) != 4:
             raise CommitMessageFormatError()
@@ -278,16 +277,21 @@ def parse_commit_messages_from_file(commit_msgs_file: str):
     try:
         return parse_commit_messages(commit_msgs)
     except Exception:
-        file_stats = os.stat(commit_msgs_file)
-        file_info: FileInfo = FileInfo()
-        file_info.file_content = commit_msgs
-        file_info.path = commit_msgs_file
-        file_info.path_write_permissions = os.access(commit_msgs_file, os.W_OK)
-        file_info.file_ctime = file_stats.st_ctime
-        file_info.file_last_modification_time = file_stats.st_mtime
-        file_info.file_last_access_time = file_stats.st_atime
-        file_info.file_permissions = oct(file_stats.st_mode)[-3:]
-        raise EmptyCommitMessagesFileError(file_info)
+        raise EmptyCommitMessagesFileError(build_file_info(commit_msgs, commit_msgs_file))
+
+
+def build_file_info(commit_msgs, commit_msgs_file):
+    file_stats = os.stat(commit_msgs_file)
+    file_info: FileInfo = FileInfo()
+    file_info.file_content = commit_msgs
+    file_info.path = commit_msgs_file
+    file_info.path_write_permissions = os.access(commit_msgs_file, os.W_OK)
+    file_info.file_ctime = datetime.fromtimestamp(file_stats.st_ctime, timezone.utc)
+    file_info.file_last_modification_time = datetime.fromtimestamp(file_stats.st_mtime, timezone.utc)
+    file_info.file_last_access_time = datetime.fromtimestamp(file_stats.st_atime, timezone.utc)
+    file_info.file_permissions = oct(file_stats.st_mode)[-3:]
+    return file_info
+
 
 def generate_info(commit_msgs: [Tuple[str, str, datetime, str]],
                   existing_activity: Activity = None,

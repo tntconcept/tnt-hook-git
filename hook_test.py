@@ -13,8 +13,8 @@ from unittest.mock import patch, MagicMock
 import httpretty
 import warnings
 
-from TNTGitHook import hook, parse_commit_messages
-from TNTGitHook.exceptions import AuthError, NotFoundError, NetworkError
+from TNTGitHook import hook, parse_commit_messages, parse_commit_messages_from_file
+from TNTGitHook.exceptions import AuthError, NotFoundError, NetworkError, EmptyCommitMessagesFileError, CommitMessagesFileNotFoundError
 from TNTGitHook.hook import Config, find_automatic_evidence, PrjConfig, parse_activities, generate_info
 from TNTGitHook.entities import *
 
@@ -55,15 +55,29 @@ class HookTestCase(unittest.TestCase):
             msg="Expected commit order doesn't comply"
         )
 
-    def test_should_show_error_when(self):
-        commits = hook.read_commit_msgs("new_branch_commits")
-        info = generate_info(parse_commit_messages(commits), None, None)
-        print(info[0])
-        self.assertRegex(
-            info[0],
-            expected_regex=self.get_regex(),
-            msg="Expected commit order doesn't comply"
-        )
+    def test_should_show_error_when_invalid_commits_format(self):
+        with self.assertRaises(EmptyCommitMessagesFileError) as error:
+            generate_info(parse_commit_messages_from_file("resources/invalid_branch_commits"), None, None)
+
+        print(error.exception)
+        raised_exception = error.exception
+        self.assertIsNotNone(raised_exception.file_info)
+        self.assertEqual(raised_exception.file_info.path, "resources/invalid_branch_commits")
+        self.assertEqual(raised_exception.file_info.file_permissions, "644")
+        self.assertTrue(raised_exception.file_info.path_write_permissions)
+        self.assertIsNotNone(raised_exception.file_info.file_ctime)
+        self.assertIsNotNone(raised_exception.file_info.file_last_access_time)
+        self.assertIsNotNone(raised_exception.file_info.file_last_modification_time)
+
+
+    def test_should_show_error_when_file_not_found_exception(self):
+        with self.assertRaises(CommitMessagesFileNotFoundError) as error:
+            generate_info(parse_commit_messages_from_file("resources/invalid_branch_commits2"), None, None)
+
+        print(error.exception)
+        self.assertEqual(error.exception.path, "resources/invalid_branch_commits2")
+        self.assertTrue(error.exception.path_write_permissions)
+
 
     @patch('TNTGitHook.hook.retrieve_keychain_credentials')
     @httpretty.activate(verbose=True, allow_net_connect=False)
