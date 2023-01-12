@@ -1,9 +1,10 @@
 import unittest
-from TNTGitHook.hook import parse_activities
-from TNTGitHook.utils import DateTimeEncoder, OrganizationListDecoder, to_class, formatRemoteURL
 from datetime import datetime
 from typing import List
-from TNTGitHook.entities import ActivitiesResponse, Activity
+
+from TNTGitHook.entities import ActivitiesResponse
+from TNTGitHook.hook import parse_activities
+from TNTGitHook.utils import DateTimeEncoder, formatRemoteURL
 
 
 class UtilsTestCase(unittest.TestCase):
