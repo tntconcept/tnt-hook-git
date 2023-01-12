@@ -55,6 +55,16 @@ class HookTestCase(unittest.TestCase):
             msg="Expected commit order doesn't comply"
         )
 
+    def test_should_show_error_when(self):
+        commits = hook.read_commit_msgs("new_branch_commits")
+        info = generate_info(parse_commit_messages(commits), None, None)
+        print(info[0])
+        self.assertRegex(
+            info[0],
+            expected_regex=self.get_regex(),
+            msg="Expected commit order doesn't comply"
+        )
+
     @patch('TNTGitHook.hook.retrieve_keychain_credentials')
     @httpretty.activate(verbose=True, allow_net_connect=False)
     def test_error_retrieving_auth_token(self, mock_keyring: MagicMock):

@@ -44,6 +44,7 @@ def main(argv=None):
 
     config_file = args.config or DEFAULT_CONFIG_FILE_PATH
     try:
+        print("hook de Sara")
         commit_msgs = parse_commit_messages(args.commit_msgs) if args.commit_msgs else parse_commit_messages_from_file(args.commit_msgs_file)
 
         with open(config_file) as config_file:
