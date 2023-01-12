@@ -46,7 +46,7 @@ class HookTestCase(unittest.TestCase):
         self.setup_fake_data()
 
     def test_generated_info_order_should_be_from_recent_to_older(self):
-        commits = hook.read_commit_msgs("new_branch_commits")
+        commits = hook.read_commit_msgs("resources/new_branch_commits")
         info = generate_info(parse_commit_messages(commits), None, None)
         print(info[0])
         self.assertRegex(
@@ -305,7 +305,7 @@ class HookTestCase(unittest.TestCase):
             }
         )
 
-        with open('new_branch_commits') as commits:
+        with open('resources/new_branch_commits') as commits:
             self.commit_messages = commits.read()
 
         with open('resources/invalid_branch_commits') as invalid_commits:
@@ -315,11 +315,11 @@ class HookTestCase(unittest.TestCase):
             data = example_activities.read()
         self.fake_activities = parse_activities(data)
 
-        with open('other_activities.json') as other_activities:
+        with open('resources/other_activities.json') as other_activities:
             data = other_activities.read()
         self.other_activities = parse_activities(data)
 
-        with open('other_activities_with_several_repos.json') as other_activities_with_several_repos:
+        with open('resources/other_activities_with_several_repos.json') as other_activities_with_several_repos:
             data = other_activities_with_several_repos.read()
         self.other_activities_with_several_repos = parse_activities(data)
 
