@@ -16,7 +16,7 @@ import stat
 
 from TNTGitHook.entities import *
 from TNTGitHook.exceptions import NoCredentialsError, AuthError, NotFoundError, NetworkError, \
-    CommitMessagesFileNotFoundError, CommitMessageFormatError, EmptyCommitMessagesFileError
+    CommitMessagesFileNotFoundError, CommitMessageFormatError, CommitMessagesFileFormatError
 from TNTGitHook.utils import DateTimeEncoder, first, to_class, formatRemoteURL
 
 NAME: str = "TNTGitHook"
@@ -277,7 +277,7 @@ def parse_commit_messages_from_file(commit_msgs_file: str):
     try:
         return parse_commit_messages(commit_msgs)
     except Exception:
-        raise EmptyCommitMessagesFileError(build_file_info(commit_msgs, commit_msgs_file))
+        raise CommitMessagesFileFormatError(build_file_info(commit_msgs, commit_msgs_file))
 
 
 def build_file_info(commit_msgs, commit_msgs_file):

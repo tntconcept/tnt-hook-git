@@ -51,7 +51,7 @@ class CommitMessageFormatError(Exception):
         return "Invalid commits messages file format"
 
 
-class EmptyCommitMessagesFileError(Exception):
+class CommitMessagesFileFormatError(Exception):
     file_info: FileInfo
 
     def __init__(self, file_info: FileInfo):

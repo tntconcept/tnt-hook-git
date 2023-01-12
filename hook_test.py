@@ -14,7 +14,7 @@ import httpretty
 import warnings
 
 from TNTGitHook import hook, parse_commit_messages, parse_commit_messages_from_file
-from TNTGitHook.exceptions import AuthError, NotFoundError, NetworkError, EmptyCommitMessagesFileError, CommitMessagesFileNotFoundError
+from TNTGitHook.exceptions import AuthError, NotFoundError, NetworkError, CommitMessagesFileFormatError, CommitMessagesFileNotFoundError
 from TNTGitHook.hook import Config, find_automatic_evidence, PrjConfig, parse_activities, generate_info
 from TNTGitHook.entities import *
 
@@ -56,7 +56,7 @@ class HookTestCase(unittest.TestCase):
         )
 
     def test_should_show_error_when_invalid_commits_format(self):
-        with self.assertRaises(EmptyCommitMessagesFileError) as error:
+        with self.assertRaises(CommitMessagesFileFormatError) as error:
             generate_info(parse_commit_messages_from_file("resources/invalid_branch_commits"), None, None)
 
         print(error.exception)
