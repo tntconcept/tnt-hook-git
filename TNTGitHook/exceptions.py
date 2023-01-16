@@ -1,3 +1,5 @@
+from TNTGitHook.entities import FileInfo
+
 
 class NoCredentialsError(Exception):
     def __str__(self):
@@ -30,3 +32,48 @@ class NotFoundError(Exception):
 
     def __str__(self):
         return self.item + " with name \"" + self.value + "\" not found in TNT"
+
+
+class CommitMessagesFileNotFoundError(Exception):
+    path: str
+    path_write_permissions: bool
+
+    def __init__(self, path: str, path_write_permissions: bool):
+        self.path = path
+        self.path_write_permissions = path_write_permissions
+
+    def __str__(self):
+        return f"**********Please contact desktop.support@autentia with the following info:**********\n" \
+               f"Commits messages file NOT FOUND. File data: path={self.path}, path_write_permissions={self.path_write_permissions}"
+
+
+class EmptyCommitMessagesFileError(Exception):
+    path: str
+    path_write_permissions: bool
+
+    def __init__(self, path: str, path_write_permissions: bool):
+        self.path = path
+        self.path_write_permissions = path_write_permissions
+
+    def __str__(self):
+        return f"**********Please contact desktop.support@autentia with the following info:**********\n" \
+               f"Commits messages file is EMPTY. File data: path={self.path}, path_write_permissions={self.path_write_permissions}"
+
+
+class CommitMessageFormatError(Exception):
+    def __str__(self):
+        return "Invalid commits messages file format"
+
+
+class CommitMessagesFileFormatError(Exception):
+    file_info: FileInfo
+
+    def __init__(self, file_info: FileInfo):
+        self.file_info = file_info
+
+    def __str__(self):
+        return f"**********Please contact desktop.support@autentia with the following info:**********\n" \
+               f"Commits messages file with INVALID FORMAT: path={self.file_info.path}, path_write_permissions={self.file_info.path_write_permissions}, " \
+               f"file_permissions={self.file_info.file_permissions}, file_last_access_time={self.file_info.file_last_access_time}, " \
+               f"file_last_modification_time={self.file_info.file_last_modification_time}, file_creation_time={self.file_info.file_ctime}, " \
+               f"file_content={self.file_info.file_content}"

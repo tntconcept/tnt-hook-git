@@ -13,8 +13,8 @@ from unittest.mock import patch, MagicMock
 import httpretty
 import warnings
 
-from TNTGitHook import hook
-from TNTGitHook.exceptions import AuthError, NotFoundError, NetworkError
+from TNTGitHook import hook, parse_commit_messages, parse_commit_messages_from_file
+from TNTGitHook.exceptions import AuthError, NotFoundError, NetworkError, CommitMessagesFileFormatError, CommitMessagesFileNotFoundError
 from TNTGitHook.hook import Config, find_automatic_evidence, PrjConfig, parse_activities, generate_info
 from TNTGitHook.entities import *
 
@@ -46,14 +46,38 @@ class HookTestCase(unittest.TestCase):
         self.setup_fake_data()
 
     def test_generated_info_order_should_be_from_recent_to_older(self):
-        commits = hook.read_commit_msgs("new_branch_commits")
-        info = hook.generate_info(commits)
+        commits = hook.read_commit_msgs("resources/new_branch_commits")
+        info = generate_info(parse_commit_messages(commits), None, None)
         print(info[0])
         self.assertRegex(
             info[0],
             expected_regex=self.get_regex(),
             msg="Expected commit order doesn't comply"
         )
+
+    def test_should_show_error_when_invalid_commits_format(self):
+        with self.assertRaises(CommitMessagesFileFormatError) as error:
+            generate_info(parse_commit_messages_from_file("resources/invalid_branch_commits"), None, None)
+
+        print(error.exception)
+        raised_exception = error.exception
+        self.assertIsNotNone(raised_exception.file_info)
+        self.assertEqual(raised_exception.file_info.path, "resources/invalid_branch_commits")
+        self.assertEqual(raised_exception.file_info.file_permissions, "644")
+        self.assertTrue(raised_exception.file_info.path_write_permissions)
+        self.assertIsNotNone(raised_exception.file_info.file_ctime)
+        self.assertIsNotNone(raised_exception.file_info.file_last_access_time)
+        self.assertIsNotNone(raised_exception.file_info.file_last_modification_time)
+
+
+    def test_should_show_error_when_file_not_found_exception(self):
+        with self.assertRaises(CommitMessagesFileNotFoundError) as error:
+            generate_info(parse_commit_messages_from_file("resources/invalid_branch_commits2"), None, None)
+
+        print(error.exception)
+        self.assertEqual(error.exception.path, "resources/invalid_branch_commits2")
+        self.assertTrue(error.exception.path_write_permissions)
+
 
     @patch('TNTGitHook.hook.retrieve_keychain_credentials')
     @httpretty.activate(verbose=True, allow_net_connect=False)
@@ -228,7 +252,7 @@ class HookTestCase(unittest.TestCase):
         prjConfig.project = "i+d - Desarrollos de Software Interno"
         prjConfig.role = "desarrollo"
         evidence = find_automatic_evidence(prjConfig, self.other_activities)
-        info = generate_info(self.commit_messages, evidence, "")
+        info = generate_info(parse_commit_messages(self.commit_messages), evidence, "")
         print(info[0])
         self.assertIsNotNone(info)
         self.assertRegex(info[0], r'(^###Autocreated evidence###\n\(DO NOT DELETE\)\n)')
@@ -239,7 +263,8 @@ class HookTestCase(unittest.TestCase):
         prjConfig.project = "i+d - Desarrollos de Software Interno"
         prjConfig.role = "desarrollo"
         evidence = find_automatic_evidence(prjConfig, self.other_activities)
-        info = generate_info(self.commit_messages, evidence, "https://ifernandezautentia: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@github.com/ifernandezautentia/dummy-2.git")
+        info = generate_info(parse_commit_messages(self.commit_messages), evidence,
+                              "https://ifernandezautentia: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@github.com/ifernandezautentia/dummy-2.git")
         print(info[0])
         self.assertIsNotNone(info)
         self.assertRegex(info[0], r'(^###Autocreated evidence###\n\(DO NOT DELETE\)\n)')
@@ -250,7 +275,8 @@ class HookTestCase(unittest.TestCase):
         prjConfig.project = "i+d - Desarrollos de Software Interno"
         prjConfig.role = "desarrollo"
         evidence = find_automatic_evidence(prjConfig, self.other_activities_with_several_repos)
-        info = generate_info(self.commit_messages, evidence, "https://****:****@github.com/user/dummy.git")
+        info = generate_info(parse_commit_messages(self.commit_messages), evidence,
+                              "https://****:****@github.com/user/dummy.git")
         print(info[0])
         self.assertIsNotNone(info)
         self.assertRegex(info[0], r'(^###Autocreated evidence###\n\(DO NOT DELETE\)\n)')
@@ -279,18 +305,21 @@ class HookTestCase(unittest.TestCase):
             }
         )
 
-        with open('new_branch_commits') as commits:
+        with open('resources/new_branch_commits') as commits:
             self.commit_messages = commits.read()
+
+        with open('resources/invalid_branch_commits') as invalid_commits:
+            self.invalid_commits_messages = invalid_commits.read()
 
         with open('example_activities') as example_activities:
             data = example_activities.read()
         self.fake_activities = parse_activities(data)
 
-        with open('other_activities.json') as other_activities:
+        with open('resources/other_activities.json') as other_activities:
             data = other_activities.read()
         self.other_activities = parse_activities(data)
 
-        with open('other_activities_with_several_repos.json') as other_activities_with_several_repos:
+        with open('resources/other_activities_with_several_repos.json') as other_activities_with_several_repos:
             data = other_activities_with_several_repos.read()
         self.other_activities_with_several_repos = parse_activities(data)
 
