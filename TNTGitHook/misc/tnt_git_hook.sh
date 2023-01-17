@@ -20,7 +20,7 @@ then
 else
 # Remote being created or deleted. For complete information view: https://www.git-scm.com/docs/githooks#_pre_push
 # We are going to retrieve the commits only accessible from the current branch (local_ref)
-  gitlog_params="$local_ref --not $(git for-each-ref --format='%(refname)' refs/heads/ | grep -v "refs/heads/$local_ref")"
+  gitlog_params="$local_ref --not $(git for-each-ref --format='%(refname)' refs/heads/ | grep -v "${local_ref}")"
 fi
 filename="/tmp/tnt-git-hook-commits-$(date +%s)"
 git log --pretty="format:%H;%aI;%an <%ae>;%s" $gitlog_params 1> $filename

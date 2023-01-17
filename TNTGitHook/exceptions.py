@@ -48,16 +48,9 @@ class CommitMessagesFileNotFoundError(Exception):
 
 
 class EmptyCommitMessagesFileError(Exception):
-    path: str
-    path_write_permissions: bool
-
-    def __init__(self, path: str, path_write_permissions: bool):
-        self.path = path
-        self.path_write_permissions = path_write_permissions
 
     def __str__(self):
-        return f"**********Please contact desktop.support@autentia with the following info:**********\n" \
-               f"Commits messages file is EMPTY. File data: path={self.path}, path_write_permissions={self.path_write_permissions}"
+        return f"You don't have commits to push!!Please commit some changes to the repository!!"
 
 
 class CommitMessageFormatError(Exception):

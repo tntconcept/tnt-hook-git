@@ -275,8 +275,7 @@ def parse_commit_messages(commit_msgs: str):
 def parse_commit_messages_from_file(commit_msgs_file: str):
     commit_msgs: str = read_commit_msgs(commit_msgs_file)
     if not commit_msgs:
-        file_path = os.path.dirname(commit_msgs_file)
-        raise EmptyCommitMessagesFileError(commit_msgs_file, os.access(file_path, os.W_OK))
+        raise EmptyCommitMessagesFileError()
     try:
         return parse_commit_messages(commit_msgs)
     except Exception:
