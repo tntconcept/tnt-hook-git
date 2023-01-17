@@ -48,12 +48,6 @@ class CommitMessagesFileNotFoundError(Exception):
 
 
 class EmptyCommitMessagesFileError(Exception):
-    path: str
-    path_write_permissions: bool
-
-    def __init__(self, path: str, path_write_permissions: bool):
-        self.path = path
-        self.path_write_permissions = path_write_permissions
 
     def __str__(self):
         return f"You don't have commits to push!!Please commit some changes to the repository!!"
