@@ -37,7 +37,7 @@ then
   fi
 fi
 
-# Do nothing on error, just inform and go ahead with "git push" (i.e. conflicts)
+# Do nothing on error, just inform and go ahead with the push operation (i.e. conflicts)
 if [ $git_exit -ne 0 ]
 then
   echo "Unable to retrieve git log information, will not create evidence on TNT but push continues"
