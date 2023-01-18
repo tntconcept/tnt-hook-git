@@ -26,6 +26,16 @@ filename="/tmp/tnt-git-hook-commits-$(date +%s)"
 git log --pretty="format:%H;%aI;%an <%ae>;%s" $gitlog_params 1> $filename
 git_exit=$?
 
+if [ ! -s $filename ]
+then
+  tag=$(git tag --points-at $local_sha)
+  if [ -n "$tag" ]
+  then
+    git log --pretty="format:%H;%aI;%an <%ae>;tag: ${tag}" -1 -U $local_sha 1> $filename
+    git_exit=$?
+  fi
+fi
+
 # Do nothing on error, just inform and go ahead with "git push" (i.e. conflicts)
 if [ $git_exit -ne 0 ]
 then
