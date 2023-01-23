@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import json
 import subprocess
-import os
 
 
 def get_last_version() -> str:
@@ -47,13 +46,13 @@ def create_new_patch_release():
         print(err.stderr.decode("utf8"))
         if err.stderr.decode("utf8").startswith("release not found"):
             # The project doesn't have any releases yet.
-            new_version_number = "0.0.1"
+            new_version_number = "0.1.0"
             print(f"Release not found. Starting with {new_version_number}")
         else:
             raise
     else:
         new_version_number = bump_minor_number(last_version_number)
-        if new_version_number != "0.0.1":
+        if new_version_number != "0.1.0":
             replace_version_number(last_version_number, new_version_number)
 
     subprocess.run(
