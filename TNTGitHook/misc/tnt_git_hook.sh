@@ -26,7 +26,18 @@ filename="/tmp/tnt-git-hook-commits-$(date +%s)"
 git log --pretty="format:%H;%aI;%an <%ae>;%s" $gitlog_params 1> $filename
 git_exit=$?
 
-# Do nothing on error, just inform and go ahead with "git push" (i.e. conflicts)
+if [ ! -s $filename ]
+then
+  # If there aren't commits to push, checks if is a tagged commit and then generate a custom evidence
+  tag=$(git tag --points-at $local_sha)
+  if [ -n "$tag" ]
+  then
+    git log --pretty="format:%H;%aI;%an <%ae>;tag: ${tag}" -1 -U $local_sha 1> $filename
+    git_exit=$?
+  fi
+fi
+
+# Do nothing on error, just inform and go ahead with the push operation (i.e. conflicts)
 if [ $git_exit -ne 0 ]
 then
   echo "Unable to retrieve git log information, will not create evidence on TNT but push continues"
