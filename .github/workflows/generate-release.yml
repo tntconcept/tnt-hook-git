@@ -25,9 +25,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
-      #- name: Git Version
-      #  id: version
-      #  uses: codacy/git-version@2.7.1
-      #- name: Use the version
-      #  run: |
-      #    echo "=${{ steps.version.outputs.version }}="
+      - name: Update version in remote
+        run: |
+          git add setup.py
+          git commit -m "chore: prepare new version"
+          git push

@@ -19,10 +19,25 @@ def get_last_version() -> str:
     return json.loads(json_string)["tagName"]
 
 
-def bump_patch_number(version_number: str) -> str:
+def bump_minor_number(version_number: str) -> str:
     """Return a copy of `version_number` with the patch number incremented."""
     major, minor, patch = version_number.split(".")
-    return f"{major}.{minor}.{int(patch) + 1}"
+    return f"{major}.{int(minor) + 1}.{patch}"
+
+
+def replace_version_number(last_version_number, new_version_number):
+    # input file
+    fin = open("../../setup.py", "rt")
+
+    # output file to write the result to
+    out_mode = open("../../setup.py", "wt")
+    # for each line in the input file
+    for line in fin:
+        # read replace the string and write to output file
+        out_mode.write(line.replace(last_version_number, new_version_number))
+    # close input and output files
+    fin.close()
+    out_mode.close()
 
 
 def create_new_patch_release():
@@ -38,7 +53,8 @@ def create_new_patch_release():
         else:
             raise
     else:
-        new_version_number = bump_patch_number(last_version_number)
+        new_version_number = bump_minor_number(last_version_number)
+        replace_version_number(last_version_number, new_version_number)
 
     subprocess.run(
         ["gh", "release", "create", "--generate-notes", new_version_number],
