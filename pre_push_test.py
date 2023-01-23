@@ -16,11 +16,11 @@ class PrePushTestCase(unittest.TestCase):
         self.assertTrue(self.pre_push.is_already_a_pre_push_file(path_to_write))
         os.remove(path_to_write)
 
-    #def test_the_pre_push_contains_itself(self):
-    #    path_to_write = "./test_pre_push.sh"
-    #    self.pre_push.write_in_file(path_to_write, self.pre_push.__str__())
-    #    self.assertTrue(self.pre_push.is_pre_push_in_file(path_to_write))
-    #    os.remove(path_to_write)
+    def test_the_pre_push_contains_itself(self):
+        path_to_write = "./test_pre_push.sh"
+        self.pre_push.write_in_file(path_to_write, self.pre_push.__str__())
+        self.assertTrue(self.pre_push.is_pre_push_in_file(path_to_write))
+        os.remove(path_to_write)
 
     def test_the_pre_push_string_is_correct(self):
         self.assertEqual(self.pre_push.__str__(),
