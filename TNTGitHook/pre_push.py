@@ -49,7 +49,7 @@ class PrePush:
         return self.is_pre_push_in_file(self.path)
 
     def is_pre_push_in_file(self, path: str) -> bool:
-        if self.is_already_a_pre_push():
+        if self.is_already_a_pre_push_file(path):
             hook_content = Path(path).read_text()
             return self.is_pre_push_correct(hook_content)
         return False
