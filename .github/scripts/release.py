@@ -54,7 +54,8 @@ def create_new_patch_release():
             raise
     else:
         new_version_number = bump_minor_number(last_version_number)
-        replace_version_number(last_version_number, new_version_number)
+        if new_version_number != "0.0.1":
+            replace_version_number(last_version_number, new_version_number)
 
     subprocess.run(
         ["gh", "release", "create", "--generate-notes", new_version_number],
