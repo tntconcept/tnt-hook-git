@@ -28,12 +28,10 @@ def bump_minor_number(version_number: str) -> str:
 
 def replace_version_number(last_version_number, new_version_number):
     # input file
-    print(os.listdir("../../"))
-    print(os.listdir())
-    fin = open("../../setup.py", "rt")
+    fin = open("setup.py", "rt")
 
     # output file to write the result to
-    out_mode = open("../../setup.py", "wt")
+    out_mode = open("setup.py", "wt")
     # for each line in the input file
     for line in fin:
         # read replace the string and write to output file
