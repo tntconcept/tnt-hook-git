@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="TNTGitHook",
-    version="0.0.1",
+    version="0.1.1",
     author="Autentia",
     author_email="info@autentia.com",
     description="Utility to auto impute activities in TNT",
