@@ -36,6 +36,7 @@ class PrePush:
     def is_already_a_pre_push_file(self, path: str) -> bool:
         try:
             hook_file = Path(self.path)
+            print(os.listdir())
             if hook_file.is_file():
                 return True
             return False
