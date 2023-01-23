@@ -28,17 +28,15 @@ def bump_minor_number(version_number: str) -> str:
 
 def replace_version_number(last_version_number, new_version_number):
     # input file
-    fin = open("setup.py", "rt")
+    file_input = open("setup.py", "rt")
+    data = file_input.read()
 
-    # output file to write the result to
-    out_mode = open("setup.py", "wt")
-    # for each line in the input file
-    for line in fin:
-        # read replace the string and write to output file
-        out_mode.write(line.replace(last_version_number, new_version_number))
-    # close input and output files
-    fin.close()
-    out_mode.close()
+    data = data.replace(last_version_number, new_version_number)
+    file_input.close()
+
+    file_input = open("setup.py", "wt")
+    file_input.write(data)
+    file_input.close()
 
 
 def create_new_patch_release():
