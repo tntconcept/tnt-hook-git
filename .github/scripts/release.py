@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import json
 import subprocess
+import os
 
 
 def get_last_version() -> str:
@@ -27,6 +28,8 @@ def bump_minor_number(version_number: str) -> str:
 
 def replace_version_number(last_version_number, new_version_number):
     # input file
+    print(os.listdir("../../"))
+    print(os.listdir())
     fin = open("../../setup.py", "rt")
 
     # output file to write the result to
