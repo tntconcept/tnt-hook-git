@@ -1,0 +1,35 @@
+name: Publish release in Nexus
+
+# Only trigger, when the generate-release workflow succeeded
+on:
+  workflow_run:
+    workflows: ["Generate release"]
+    types:
+      - completed
+
+jobs:
+  publish-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install twine
+          
+      - name: Build release
+        run: |
+          python setup.py sdist bdist_wheel
+
+      - name: Upload to Nexus
+        run: |
+          python -m twine upload --repository-url https://tnt.autentia.com/nexus/repository/autentia-pypi/ dist/*
