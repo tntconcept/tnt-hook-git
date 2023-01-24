@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import sys, getopt
 import json
 import subprocess
 
@@ -54,12 +55,12 @@ def create_new_minor_release():
             # The project doesn't have any releases yet.
             new_version_number = "0.1.0"
             print(f"Release not found. Starting with {new_version_number}")
-            replace_version_number("0.0.0", new_version_number)
+            # replace_version_number("0.0.0", new_version_number)
         else:
             raise
-    else:
-        new_version_number = bump_minor_number(last_version_number)
-        replace_version_number(last_version_number, new_version_number)
+    # else:
+    new_version_number = bump_minor_number(last_version_number)
+    replace_version_number(last_version_number, new_version_number)
 
     subprocess.run(
         ["gh", "release", "create", "--generate-notes", new_version_number],
@@ -67,5 +68,25 @@ def create_new_minor_release():
     )
 
 
+def create_new_minor_release_2(next_release: str):
+    if next_release:
+        new_version_number = bump_minor_number(next_release)
+        replace_version_number(next_release, new_version_number)
+
+        # Create a new minor release on GitHub
+        subprocess.run(
+            ["gh", "release", "create", "--generate-notes", next_release],
+            check=True,
+        )
+
+
+def main(argv):
+    opts, args = getopt.getopt(argv, "r:", ["release="])
+    for opt, arg in opts:
+        if opt in ('-r', '--release'):
+            print(f"Generating release {arg}")
+            create_new_minor_release_2(arg)
+
+
 if __name__ == "__main__":
-    create_new_minor_release()
+    main(sys.argv[1:])
