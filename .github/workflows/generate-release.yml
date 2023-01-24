@@ -63,4 +63,4 @@ jobs:
 
       - name: Upload to Nexus
         run: |
-          python -m twine upload --repository-url https://tnt.autentia.com/nexus/repository/autentia-pypi/ dist/*
+          python -m twine upload --repository-url https://tnt.autentia.com/nexus/repository/autentia-pypi/ dist/* -u ${{ secrets.NEXUS_REPOSITORY_USER }} -p ${{ secrets.NEXUS_REPOSITORY_PASSWORD }}
