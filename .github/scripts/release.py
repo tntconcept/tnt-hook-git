@@ -20,26 +20,32 @@ def get_last_version() -> str:
 
 
 def bump_minor_number(version_number: str) -> str:
-    """Return a copy of `version_number` with the patch number incremented."""
+    """Return a copy of `version_number` with the minor number incremented."""
     major, minor, patch = version_number.split(".")
     return f"{major}.{int(minor) + 1}.{patch}"
 
 
-def replace_version_number(last_version_number, new_version_number):
-    # input file
-    file_input = open("setup.py", "rt")
-    data = file_input.read()
+def replace_version_number(last_version_number: str, new_version_number: str):
+    file_content = generate_setup_file_content_with_new_version(last_version_number, new_version_number)
+    write_new_setup_file(file_content)
 
-    data = data.replace(last_version_number, new_version_number)
-    file_input.close()
 
+def write_new_setup_file(file_content: str):
     file_input = open("setup.py", "wt")
-    file_input.write(data)
+    file_input.write(file_content)
     file_input.close()
 
 
-def create_new_patch_release():
-    """Create a new patch release on GitHub."""
+def generate_setup_file_content_with_new_version(last_version_number: str, new_version_number: str) -> str:
+    file_input = open("setup.py", "rt")
+    file_content = file_input.read()
+    file_content = file_content.replace(last_version_number, new_version_number)
+    file_input.close()
+    return file_content
+
+
+def create_new_minor_release():
+    """Create a new minor release on GitHub."""
     try:
         last_version_number = get_last_version()
     except subprocess.CalledProcessError as err:
@@ -62,4 +68,4 @@ def create_new_patch_release():
 
 
 if __name__ == "__main__":
-    create_new_patch_release()
+    create_new_minor_release()
