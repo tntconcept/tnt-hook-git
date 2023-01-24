@@ -54,14 +54,12 @@ def create_new_minor_release():
             # The project doesn't have any releases yet.
             new_version_number = "0.1.0"
             print(f"Release not found. Starting with {new_version_number}")
+            replace_version_number("0.0.0", new_version_number)
         else:
             raise
     else:
         new_version_number = bump_minor_number(last_version_number)
-        if new_version_number != "0.1.0":
-            replace_version_number(last_version_number, new_version_number)
-        else:
-            replace_version_number("0.0.0", new_version_number)
+        replace_version_number(last_version_number, new_version_number)
 
     subprocess.run(
         ["gh", "release", "create", "--generate-notes", new_version_number],
