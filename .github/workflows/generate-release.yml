@@ -15,18 +15,24 @@ jobs:
           ref: ${{ github.head_ref }}   # checkout the correct branch name
           fetch-depth: 0 # fetch the whole repo history
 
-      - name: "Configure Git User"
+      - name: Configure Git User
         run: |
           git config user.email "actions@github.com"
           git config user.name "GitHub Actions"
 
+      - name: Get next release candidate
+        run: |
+          NEXT_RELEASE=$(grep 'version=' setup.py | sed 's/version="//' | sed 's/",//' | xargs)
+          echo "NEXT_RELEASE=$NEXT_RELEASE" >> $GITHUB_ENV
+        shell: bash
+
       - name: Create new minor release
-        run: .github/scripts/release.py
+        run: .github/scripts/release.py --release ${{ env.NEXT_RELEASE }}
         env:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
       - name: Update version in remote
         run: |
           git add setup.py
-          git commit -m "chore: prepare new version"
+          git commit -m "chore: prepare next release candidate"
           git push

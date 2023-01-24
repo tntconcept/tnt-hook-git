@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
+import sys, getopt
 import json
 import subprocess
 
 
 def get_last_version() -> str:
-    """Return the version number of the last release."""
+    # Return the version number of the last release
     json_string = (
         subprocess.run(
             ["gh", "release", "view", "--json", "tagName"],
@@ -20,7 +21,7 @@ def get_last_version() -> str:
 
 
 def bump_minor_number(version_number: str) -> str:
-    """Return a copy of `version_number` with the minor number incremented."""
+    # Return a copy of `version_number` with the minor number incremented
     major, minor, patch = version_number.split(".")
     return f"{major}.{int(minor) + 1}.{patch}"
 
@@ -44,28 +45,25 @@ def generate_setup_file_content_with_new_version(last_version_number: str, new_v
     return file_content
 
 
-def create_new_minor_release():
-    """Create a new minor release on GitHub."""
-    try:
-        last_version_number = get_last_version()
-    except subprocess.CalledProcessError as err:
-        print(err.stderr.decode("utf8"))
-        if err.stderr.decode("utf8").startswith("release not found"):
-            # The project doesn't have any releases yet.
-            new_version_number = "0.1.0"
-            print(f"Release not found. Starting with {new_version_number}")
-            replace_version_number("0.0.0", new_version_number)
-        else:
-            raise
-    else:
-        new_version_number = bump_minor_number(last_version_number)
-        replace_version_number(last_version_number, new_version_number)
+def create_new_minor_release(next_release: str):
+    if next_release:
+        new_version_number = bump_minor_number(next_release)
+        replace_version_number(next_release, new_version_number)
 
-    subprocess.run(
-        ["gh", "release", "create", "--generate-notes", new_version_number],
-        check=True,
-    )
+        # Create a new minor release on GitHub
+        subprocess.run(
+            ["gh", "release", "create", "--generate-notes", next_release],
+            check=True,
+        )
+
+
+def main(argv):
+    opts, args = getopt.getopt(argv, "r:", ["release="])
+    for opt, arg in opts:
+        if opt in ('-r', '--release'):
+            print(f"Generating release {arg}")
+            create_new_minor_release(arg)
 
 
 if __name__ == "__main__":
-    create_new_minor_release()
+    main(sys.argv[1:])
