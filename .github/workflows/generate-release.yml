@@ -3,7 +3,7 @@ name: Generate release
 on: workflow_dispatch
 
 jobs:
-  release:
+  generate-release:
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -36,3 +36,30 @@ jobs:
           git add setup.py
           git commit -m "chore: prepare next release candidate"
           git push
+
+  publish-release:
+    needs: generate-release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install twine
+
+      - name: Build release
+        run: |
+          python setup.py sdist bdist_wheel
+
+      - name: Upload to Nexus
+        run: |
+          python -m twine upload --repository-url https://tnt.autentia.com/nexus/repository/autentia-pypi/ dist/*
