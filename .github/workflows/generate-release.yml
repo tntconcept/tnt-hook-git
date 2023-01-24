@@ -20,7 +20,7 @@ jobs:
           git config user.email "actions@github.com"
           git config user.name "GitHub Actions"
 
-      - name: Create new patch release
+      - name: Create new minor release
         run: .github/scripts/release.py
         env:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
