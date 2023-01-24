@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-import sys, getopt
+import getopt
 import json
 import subprocess
+import sys
 
 
 def get_last_version() -> str:
