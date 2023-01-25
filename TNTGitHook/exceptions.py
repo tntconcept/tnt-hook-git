@@ -50,7 +50,7 @@ class CommitMessagesFileNotFoundError(Exception):
 class EmptyCommitMessagesFileError(Exception):
 
     def __str__(self):
-        return f"You don't have commits to push !! Please commit some changes to the repository !!"
+        return f"You don't have commits to push!! Please commit some changes to the repository!!"
 
 
 class CommitMessageFormatError(Exception):
