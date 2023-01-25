@@ -19,6 +19,21 @@ jobs:
           git config user.email "actions@github.com"
           git config user.name "GitHub Actions"
 
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install twine
+          pip install wheel
+
+      - name: Build release
+        run: |
+          python setup.py sdist bdist_wheel
+
       - name: Get next release candidate
         id: next-release
         run: |
@@ -36,37 +51,41 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Upload to Nexus
+        run: |
+         python -m twine upload --repository-url https://tnt.autentia.com/nexus/repository/autentia-pypi/ dist/* -u ${{ secrets.NEXUS_REPOSITORY_USER }} -p ${{ secrets.NEXUS_REPOSITORY_PASSWORD }}
+
       - name: Update version in remote
         run: |
           git add setup.py
           git commit -m "chore: prepare next release candidate"
           git push
 
-  publish-release:
-    needs: generate-release
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          ref: ${{ needs.generate-release.outputs.release-tag }}
-
-      - name: Set up Python 3.10
-        uses: actions/setup-python@v3
-        with:
-          python-version: "3.10"
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install twine
-          pip install wheel
-
-      - name: Build release
-        run: |
-          python setup.py sdist bdist_wheel
+#  publish-release:
+#    needs: generate-release
+#    runs-on: ubuntu-latest
+#    permissions:
+#      contents: write
+#
+#    steps:
+#      - uses: actions/checkout@v3
+#        with:
+#          ref: ${{ needs.generate-release.outputs.release-tag }}
+#
+#      - name: Set up Python 3.10
+#        uses: actions/setup-python@v3
+#        with:
+#          python-version: "3.10"
+#
+#      - name: Install dependencies
+#        run: |
+#          python -m pip install --upgrade pip
+#          pip install twine
+#          pip install wheel
+#
+#      - name: Build release
+#        run: |
+#          python setup.py sdist bdist_wheel
 
 #      - name: Upload to Nexus
 #        run: |
