@@ -18,18 +18,19 @@ jobs:
           git config user.name "GitHub Actions"
 
       - name: Get next release candidate
+        id: next-release
         run: |
           NEXT_RELEASE=$(grep 'version=' setup.py | sed 's/version="//' | sed 's/",//' | xargs)
-          echo "NEXT_RELEASE=$NEXT_RELEASE" >> $GITHUB_ENV
+          echo "NEXT_RELEASE=$NEXT_RELEASE" >> $GITHUB_OUTPUT
         shell: bash
 
       - name: Create tag for release
         run: |
-          git tag ${{ env.NEXT_RELEASE }}
-          git push origin ${{ env.NEXT_RELEASE }}
+          git tag ${{ steps.next-release.outputs.$NEXT_RELEASE }}
+          git push origin ${{ steps.next-release.outputs.$NEXT_RELEASE }}
 
       - name: Create new minor release
-        run: .github/scripts/release.py --release ${{ env.NEXT_RELEASE }}
+        run: .github/scripts/release.py --release ${{ steps.next-release.outputs.$NEXT_RELEASE }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
