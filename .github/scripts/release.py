@@ -49,13 +49,13 @@ def generate_setup_file_content_with_new_version(last_version_number: str, new_v
 def create_new_minor_release(next_release: str):
     if next_release:
         new_version_number = bump_minor_number(next_release)
-        replace_version_number(next_release, new_version_number)
 
         # Create a new minor release on GitHub
         subprocess.run(
-            ["gh", "release", "create", "--generate-notes", next_release],
+            ["gh", "release", "create", "--verify-tag", "--generate-notes", next_release],
             check=True,
         )
+        replace_version_number(next_release, new_version_number)
 
 
 def main(argv):
