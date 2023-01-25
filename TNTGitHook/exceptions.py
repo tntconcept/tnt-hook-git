@@ -43,14 +43,14 @@ class CommitMessagesFileNotFoundError(Exception):
         self.path_write_permissions = path_write_permissions
 
     def __str__(self):
-        return f"**********Please contact desktop.support@autentia with the following info:**********\n" \
+        return f"********** Please contact desktop.support@autentia with the following info: **********\n" \
                f"Commits messages file NOT FOUND. File data: path={self.path}, path_write_permissions={self.path_write_permissions}"
 
 
 class EmptyCommitMessagesFileError(Exception):
 
     def __str__(self):
-        return f"You don't have commits to push!!Please commit some changes to the repository!!"
+        return f"You don't have commits to push!! Please commit some changes to the repository!!"
 
 
 class CommitMessageFormatError(Exception):
@@ -65,7 +65,7 @@ class CommitMessagesFileFormatError(Exception):
         self.file_info = file_info
 
     def __str__(self):
-        return f"**********Please contact desktop.support@autentia with the following info:**********\n" \
+        return f"********** Please contact desktop.support@autentia with the following info: **********\n" \
                f"Commits messages file with INVALID FORMAT: path={self.file_info.path}, path_write_permissions={self.file_info.path_write_permissions}, " \
                f"file_permissions={self.file_info.file_permissions}, file_last_access_time={self.file_info.file_last_access_time}, " \
                f"file_last_modification_time={self.file_info.file_last_modification_time}, file_creation_time={self.file_info.file_ctime}, " \
