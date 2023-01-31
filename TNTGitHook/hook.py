@@ -83,10 +83,10 @@ def setup_config_with_path(config: Config, selected_organization: str, selected_
             with open(path, "w") as f:
                 f.write(json.dumps(prj_config.__dict__, sort_keys=True, indent=4))
         else:
-            print(f"********** Using project configuration found in ${path}: **********\n"
-                  f"Organization: ${selected_organization}\n"
-                  f"Project: ${selected_project}\n"
-                  f"Role: ${selected_role}\n")
+            print(f"********** Using project configuration found in {path}: **********\n"
+                  f"Organization: {prj_config_input[0]}\n"
+                  f"Project: {prj_config_input[1]}\n"
+                  f"Role: {prj_config_input[2]}\n")
     except FileNotFoundError:
         print("Unable to setup config. Is this a git repository?\nMaybe you're not at the root folder.")
     except Exception as ex:
