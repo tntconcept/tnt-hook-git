@@ -68,19 +68,20 @@ def setup_config(config: Config, selected_organization: str, selected_project: s
 
 def setup_config_with_path(config: Config, selected_organization: str, selected_project: str, selected_role: str, path: str):
     try:
-        check_new_setup(path, selected_organization, selected_project, selected_role)
+        prj_config_input = check_new_setup(path, selected_organization, selected_project, selected_role)
         headers = generate_request_headers(config)
-        organization = check_organization_exists(config, headers, selected_organization)
-        project = check_project_exists(config, headers, organization, selected_project)
-        role = check_role_exists(config, headers, project, selected_role)
+        organization = check_organization_exists(config, headers, prj_config_input[0])
+        project = check_project_exists(config, headers, organization, prj_config_input[1])
+        role = check_role_exists(config, headers, project, prj_config_input[2])
 
         prj_config = PrjConfig()
         prj_config.organization = organization.name
         prj_config.project = project.name
         prj_config.role = role.name
 
-        with open(path, "w") as f:
-            f.write(json.dumps(prj_config.__dict__, sort_keys=True, indent=4))
+        if is_new_setup_by_parameters(selected_organization, selected_project, selected_role):
+            with open(path, "w") as f:
+                f.write(json.dumps(prj_config.__dict__, sort_keys=True, indent=4))
     except FileNotFoundError:
         print("Unable to setup config. Is this a git repository?\nMaybe you're not at the root folder.")
     except Exception as ex:
@@ -88,14 +89,20 @@ def setup_config_with_path(config: Config, selected_organization: str, selected_
 
 
 def check_new_setup(path: str, organization: str, project: str, role: str):
-    if (not organization) and (not project) and (not role):
+    if not is_new_setup_by_parameters(organization, project, role):
         config_file = Path(path)
         if not config_file.is_file():
             raise InvalidSetupConfigurationError()
         else:
-            return False
+            file = open(config_file)
+            prj_config_file = json.load(file)
+            return prj_config_file["organization"], prj_config_file["project"], prj_config_file["role"]
     else:
-        return True
+        return organization, project, role
+
+
+def is_new_setup_by_parameters(organization: str, project: str, role: str):
+    return organization and project and role
 
 
 def write_hook_script():
