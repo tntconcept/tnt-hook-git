@@ -290,7 +290,6 @@ class HookTestCase(unittest.TestCase):
         self.assertEqual("i+d - Desarrollos de Software Interno", is_new_setup[1])
         self.assertEqual("desarrollo", is_new_setup[2])
 
-
     def test_check_new_setup_should_return_false(self):
         is_new_setup = check_new_setup("resources/TNTGitHookConfig.json", "", "", "")
 
