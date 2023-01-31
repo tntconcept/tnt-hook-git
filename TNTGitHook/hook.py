@@ -4,19 +4,21 @@ import hashlib
 import json
 import os
 import pkgutil
+import stat
+from datetime import timezone
 from functools import reduce
+from pathlib import Path
 from typing import List, Tuple
-from datetime import datetime, timezone
 
 import keyring
 import requests
 from keyring.errors import PasswordDeleteError
 from requests import Response
-import stat
 
 from TNTGitHook.entities import *
 from TNTGitHook.exceptions import NoCredentialsError, AuthError, NotFoundError, NetworkError, \
-    CommitMessagesFileNotFoundError, CommitMessageFormatError, CommitMessagesFileFormatError, EmptyCommitMessagesFileError
+    CommitMessagesFileNotFoundError, CommitMessageFormatError, CommitMessagesFileFormatError, \
+    EmptyCommitMessagesFileError, InvalidSetupConfigurationError
 from TNTGitHook.utils import DateTimeEncoder, first, to_class, formatRemoteURL
 
 NAME: str = "TNTGitHook"
@@ -60,23 +62,18 @@ class PrjConfig:
         return "###Autocreated evidence###\n(DO NOT DELETE)"
 
 
-def setup_config(config:Config, selected_organization:str, selected_project:str, selected_role:str):
-    if selected_organization == "":
-        selected_organization = input("Organization: ")
+def setup_config(config: Config, selected_organization: str, selected_project: str, selected_role: str):
+    setup_config_with_path(config, selected_organization, selected_project, selected_role, DEFAULT_CONFIG_FILE_PATH)
 
-    if selected_project == "":
-        selected_project = input("Project: ")
 
-    if selected_role == "":
-        selected_role = input("Role: ")
-
+def setup_config_with_path(config: Config, selected_organization: str, selected_project: str, selected_role: str, path: str):
     try:
+        check_new_setup(path, selected_organization, selected_project, selected_role)
         headers = generate_request_headers(config)
         organization = check_organization_exists(config, headers, selected_organization)
         project = check_project_exists(config, headers, organization, selected_project)
         role = check_role_exists(config, headers, project, selected_role)
 
-        path = DEFAULT_CONFIG_FILE_PATH
         prj_config = PrjConfig()
         prj_config.organization = organization.name
         prj_config.project = project.name
@@ -88,6 +85,17 @@ def setup_config(config:Config, selected_organization:str, selected_project:str,
         print("Unable to setup config. Is this a git repository?\nMaybe you're not at the root folder.")
     except Exception as ex:
         print(ex)
+
+
+def check_new_setup(path: str, organization: str, project: str, role: str):
+    if (not organization) and (not project) and (not role):
+        config_file = Path(path)
+        if not config_file.is_file():
+            raise InvalidSetupConfigurationError()
+        else:
+            return False
+    else:
+        return True
 
 
 def write_hook_script():

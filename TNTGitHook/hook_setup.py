@@ -2,7 +2,7 @@ import hashlib
 from pathlib import Path
 
 from TNTGitHook import hook
-from TNTGitHook.hook import write_hook_script, Config, setup_config
+from TNTGitHook.hook import write_hook_script, Config, setup_config_with_path
 from TNTGitHook.pre_push import PrePush
 
 
@@ -28,7 +28,7 @@ def write_hook():
 def setup(config: Config, organization:str, project: str, role: str):
     write_hook_script()
     write_pre_push_script()
-    setup_config(config, organization, project, role)
+    setup_config_with_path(config, organization, project, role)
 
 def write_pre_push_script():
     pre_push = PrePush()
