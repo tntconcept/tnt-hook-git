@@ -141,6 +141,12 @@ def creates_hook_directory():
     return users_path
 
 
+def removes_old_hook_file():
+    exists = os.path.exists("/usr/local/bin/tnt_git_hook")
+    if exists:
+        os.remove("/usr/local/bin/tnt_git_hook")
+
+
 def get_hook_sha1():
     hook_script = pkgutil.get_data('TNTGitHook', 'misc/tnt_git_hook.sh').decode('utf8')
     return hashlib.sha1(hook_script.encode('utf8')).hexdigest()
