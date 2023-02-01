@@ -7,16 +7,17 @@
 
 import json
 import unittest
+import warnings
 from typing import List
 from unittest.mock import patch, MagicMock
 
 import httpretty
-import warnings
 
 from TNTGitHook import hook, parse_commit_messages, parse_commit_messages_from_file
-from TNTGitHook.exceptions import AuthError, NotFoundError, NetworkError, CommitMessagesFileFormatError, CommitMessagesFileNotFoundError
-from TNTGitHook.hook import Config, find_automatic_evidence, PrjConfig, parse_activities, generate_info
 from TNTGitHook.entities import *
+from TNTGitHook.exceptions import AuthError, NotFoundError, NetworkError, CommitMessagesFileFormatError, \
+    CommitMessagesFileNotFoundError, InvalidSetupConfigurationError
+from TNTGitHook.hook import Config, find_automatic_evidence, PrjConfig, parse_activities, generate_info, check_new_setup
 
 
 class HookTestCase(unittest.TestCase):
@@ -69,7 +70,6 @@ class HookTestCase(unittest.TestCase):
         self.assertIsNotNone(raised_exception.file_info.file_last_access_time)
         self.assertIsNotNone(raised_exception.file_info.file_last_modification_time)
 
-
     def test_should_show_error_when_file_not_found_exception(self):
         with self.assertRaises(CommitMessagesFileNotFoundError) as error:
             generate_info(parse_commit_messages_from_file("resources/invalid_branch_commits2"), None, None)
@@ -77,7 +77,6 @@ class HookTestCase(unittest.TestCase):
         print(error.exception)
         self.assertEqual(error.exception.path, "resources/invalid_branch_commits2")
         self.assertTrue(error.exception.path_write_permissions)
-
 
     @patch('TNTGitHook.hook.retrieve_keychain_credentials')
     @httpretty.activate(verbose=True, allow_net_connect=False)
@@ -280,6 +279,33 @@ class HookTestCase(unittest.TestCase):
         print(info[0])
         self.assertIsNotNone(info)
         self.assertRegex(info[0], r'(^###Autocreated evidence###\n\(DO NOT DELETE\)\n)')
+
+    def test_check_new_setup_should_return_true(self):
+        organization = "Autentia Real Business Solutions S.L."
+        project = "i+d - Desarrollos de Software Interno"
+        role = "desarrollo"
+        is_new_setup = check_new_setup("path", organization, project, role)
+
+        self.assertEqual("Autentia Real Business Solutions S.L.", is_new_setup[0])
+        self.assertEqual("i+d - Desarrollos de Software Interno", is_new_setup[1])
+        self.assertEqual("desarrollo", is_new_setup[2])
+
+    def test_check_new_setup_should_return_false(self):
+        is_new_setup = check_new_setup("resources/TNTGitHookConfig.json", "", "", "")
+
+        self.assertEqual("Autentia Real Business Solutions S.L.", is_new_setup[0])
+        self.assertEqual("i+d - Mentoring", is_new_setup[1])
+        self.assertEqual("Mentor", is_new_setup[2])
+
+    def test_check_new_setup_should_raise_invalid_setup_configuration(self):
+        self.assertRaises(InvalidSetupConfigurationError, hook.check_new_setup, "resources/NotExist.json", "", "", "")
+
+    def test_check_new_setup_should_raise_invalid_setup_configuration_if_configuration_file_is_invalid(self):
+        self.assertRaises(InvalidSetupConfigurationError, hook.check_new_setup, "resources/InvalidFieldTNTGitHookConfig.json", "", "", "")
+
+    def test_check_new_setup_should_raise_invalid_setup_configuration_if_configuration_file_has_empty_field(self):
+        self.assertRaises(InvalidSetupConfigurationError, hook.check_new_setup, "resources/EmptyFieldTNTGitHookConfig.json", "", "", "")
+
 
     def get_regex(self) -> str:
         header = r'(^###Autocreated evidence###\n\(DO NOT DELETE\)\n){1}'

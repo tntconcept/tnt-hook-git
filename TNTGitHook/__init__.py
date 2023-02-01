@@ -4,7 +4,7 @@ import json
 import requests
 
 from TNTGitHook.credentials import ask
-from TNTGitHook.exceptions import CommitMessageFormatError
+from TNTGitHook.exceptions import CommitMessageFormatError, InvalidSetupConfigurationError
 from TNTGitHook.hook import Config, PrjConfig, DEFAULT_CONFIG_FILE_PATH, NAME, read_commit_msgs, \
     parse_commit_messages, create_activity, parse_commit_messages_from_file
 from TNTGitHook.hook_setup import is_update_needed, write_hook, setup
@@ -37,8 +37,12 @@ def main(argv=None):
         return
 
     if args.setup:
-        setup(config, args.organization, args.project, args.role)
-        return
+        try:
+            setup(config, args.organization, args.project, args.role)
+            return
+        except InvalidSetupConfigurationError as error:
+            print(error)
+            exit(-1)
 
     config_file = args.config or DEFAULT_CONFIG_FILE_PATH
     try:

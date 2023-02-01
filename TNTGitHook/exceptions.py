@@ -70,3 +70,9 @@ class CommitMessagesFileFormatError(Exception):
                f"file_permissions={self.file_info.file_permissions}, file_last_access_time={self.file_info.file_last_access_time}, " \
                f"file_last_modification_time={self.file_info.file_last_modification_time}, file_creation_time={self.file_info.file_ctime}, " \
                f"file_content={self.file_info.file_content}"
+
+
+class InvalidSetupConfigurationError(Exception):
+    def __str__(self):
+        return f"Invalid setup configuration.\n" \
+            f"usage: TNTGitHook [-h] --setup --organization ORGANIZATION --project PROJECT --role ROLE"
