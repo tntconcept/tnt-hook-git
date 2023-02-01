@@ -1,6 +1,7 @@
 import os
 import unittest
 from TNTGitHook.pre_push import PrePush
+from pathlib import Path
 
 
 class PrePushTestCase(unittest.TestCase):
@@ -27,14 +28,14 @@ class PrePushTestCase(unittest.TestCase):
                          "#!/bin/bash\n"
                          "set -o pipefail\n"
                          "read local_ref local_sha remote_ref remote_sha\n"
-                         "tnt_git_hook $local_ref $local_sha $remote_ref $remote_sha $(git rev-parse --show-toplevel)")
+                         f"{str(Path.home())}/.tnt/hook/bin/tnt_git_hook $local_ref $local_sha $remote_ref $remote_sha $(git rev-parse --show-toplevel)")
 
     def test_the_pre_push_string_is_correct_when_there_are_more_elements(self):
         self.assertTrue(self.pre_push.is_pre_push_correct(
                          "#!/bin/bash\n"
                          "read local_ref local_sha remote_ref remote_sha\n"
                          "npm run test:ci\n"
-                         "tnt_git_hook $local_ref $local_sha $remote_ref $remote_sha $(git rev-parse --show-toplevel)"))
+                         f"{str(Path.home())}/.tnt/hook/bin/tnt_git_hook $local_ref $local_sha $remote_ref $remote_sha $(git rev-parse --show-toplevel)"))
 
     def test_the_pre_push_is_composed_correctly(self):
         self.assertEqual(self.pre_push.compose_pre_hook("#!/bin/sh\nnpm run test:ci"),
@@ -42,7 +43,7 @@ class PrePushTestCase(unittest.TestCase):
                          "set -o pipefail\n"
                          "read local_ref local_sha remote_ref remote_sha\n"
                          "npm run test:ci\n"
-                         "tnt_git_hook $local_ref $local_sha $remote_ref $remote_sha $(git rev-parse --show-toplevel)")
+                         f"{str(Path.home())}/.tnt/hook/bin/tnt_git_hook $local_ref $local_sha $remote_ref $remote_sha $(git rev-parse --show-toplevel)")
 
     def test_old_lines_are_removed(self):
         self.assertListEqual([],
@@ -50,7 +51,7 @@ class PrePushTestCase(unittest.TestCase):
                                                                     "# Assumes tnt_git_hook.sh is on PATH",
                                                                     "PROJECT_PATH=$(git rev-parse --show-toplevel)",
                                                                     "set -o pipefail",
-                                                                    "tnt_git_hook $local_ref $local_sha $remote_ref $remote_sha $PROJECT_PATH"]))
+                                                                    f"{str(Path.home())}/.tnt/hook/bin/tnt_git_hook $local_ref $local_sha $remote_ref $remote_sha $PROJECT_PATH"]))
 
         self.assertListEqual(["npm run test:ci"],
                              self.pre_push.remove_old_script_lines(["read local_ref local_sha remote_ref remote_sha",
@@ -58,7 +59,7 @@ class PrePushTestCase(unittest.TestCase):
                                                                     "npm run test:ci",
                                                                     "PROJECT_PATH=$(git rev-parse --show-toplevel)",
                                                                     "set -o pipefail",
-                                                                    "tnt_git_hook $local_ref $local_sha $remote_ref $remote_sha $PROJECT_PATH"]))
+                                                                    f"{str(Path.home())}/.tnt/hook/bin/tnt_git_hook $local_ref $local_sha $remote_ref $remote_sha $PROJECT_PATH"]))
 
 
 if __name__ == '__main__':

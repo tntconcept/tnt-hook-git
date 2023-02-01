@@ -4,19 +4,21 @@ import hashlib
 import json
 import os
 import pkgutil
+import stat
+from datetime import timezone
 from functools import reduce
 from typing import List, Tuple
-from datetime import datetime, timezone
+from pathlib import Path
 
 import keyring
 import requests
 from keyring.errors import PasswordDeleteError
 from requests import Response
-import stat
 
 from TNTGitHook.entities import *
 from TNTGitHook.exceptions import NoCredentialsError, AuthError, NotFoundError, NetworkError, \
-    CommitMessagesFileNotFoundError, CommitMessageFormatError, CommitMessagesFileFormatError, EmptyCommitMessagesFileError
+    CommitMessagesFileNotFoundError, CommitMessageFormatError, CommitMessagesFileFormatError, \
+    EmptyCommitMessagesFileError
 from TNTGitHook.utils import DateTimeEncoder, first, to_class, formatRemoteURL
 
 NAME: str = "TNTGitHook"
@@ -93,15 +95,23 @@ def setup_config(config:Config, selected_organization:str, selected_project:str,
 def write_hook_script():
     hook_script = pkgutil.get_data('TNTGitHook', 'misc/tnt_git_hook.sh').decode('utf8')
     try:
-        path = f"/usr/local/bin/tnt_git_hook"
+        hook_directory = creates_hook_directory()
+        path = f"{hook_directory}/tnt_git_hook"
         with open(path, "w") as file:
             file.write(hook_script)
             stats = os.stat(path)
             os.chmod(path, stats.st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
     except FileNotFoundError:
-        print(f"Unable to setup hook script. Are you able to write to /usr/local/bin?")
+        print(f"Unable to setup hook script. Are you able to write to {str(Path.home())}?")
     except Exception as ex:
         print(ex)
+
+
+def creates_hook_directory():
+    users_path = f"{str(Path.home())}/.tnt/hook/bin/"
+    if not Path(users_path).exists():
+        os.makedirs(users_path)
+    return users_path
 
 
 def get_hook_sha1():
