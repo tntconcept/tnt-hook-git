@@ -79,7 +79,7 @@ def setup_config_with_path(config: Config, selected_organization: str, selected_
         prj_config.project = project.name
         prj_config.role = role.name
 
-        if is_new_setup_by_parameters(selected_organization, selected_project, selected_role):
+        if is_valid_configuration(selected_organization, selected_project, selected_role):
             with open(path, "w") as f:
                 f.write(json.dumps(prj_config.__dict__, sort_keys=True, indent=4))
         else:
@@ -94,20 +94,28 @@ def setup_config_with_path(config: Config, selected_organization: str, selected_
 
 
 def check_new_setup(path: str, organization: str, project: str, role: str):
-    if not is_new_setup_by_parameters(organization, project, role):
+    if not is_valid_configuration(organization, project, role):
         config_file = Path(path)
         if not config_file.is_file():
             raise InvalidSetupConfigurationError()
         else:
             file = open(config_file)
             prj_config_file = json.load(file)
-            return prj_config_file["organization"], prj_config_file["project"], prj_config_file["role"]
+            if is_valid_file_configuration(prj_config_file)\
+                    and is_valid_configuration(prj_config_file["organization"], prj_config_file["project"], prj_config_file["role"]):
+                return prj_config_file["organization"], prj_config_file["project"], prj_config_file["role"]
+            else:
+                raise InvalidSetupConfigurationError()
     else:
         return organization, project, role
 
 
-def is_new_setup_by_parameters(organization: str, project: str, role: str):
+def is_valid_configuration(organization: str, project: str, role: str):
     return organization and project and role
+
+
+def is_valid_file_configuration(config_file):
+    return "organization" in config_file and "project" in config_file and "role" in config_file
 
 
 def write_hook_script():

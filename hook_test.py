@@ -300,6 +300,13 @@ class HookTestCase(unittest.TestCase):
     def test_check_new_setup_should_raise_invalid_setup_configuration(self):
         self.assertRaises(InvalidSetupConfigurationError, hook.check_new_setup, "resources/NotExist.json", "", "", "")
 
+    def test_check_new_setup_should_raise_invalid_setup_configuration_if_configuration_file_is_invalid(self):
+        self.assertRaises(InvalidSetupConfigurationError, hook.check_new_setup, "resources/InvalidFieldTNTGitHookConfig.json", "", "", "")
+
+    def test_check_new_setup_should_raise_invalid_setup_configuration_if_configuration_file_has_empty_field(self):
+        self.assertRaises(InvalidSetupConfigurationError, hook.check_new_setup, "resources/EmptyFieldTNTGitHookConfig.json", "", "", "")
+
+
     def get_regex(self) -> str:
         header = r'(^###Autocreated evidence###\n\(DO NOT DELETE\)\n){1}'
         sha = r'([\da-f]{40}\n)'
