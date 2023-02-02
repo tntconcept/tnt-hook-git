@@ -27,8 +27,8 @@ def write_hook():
 
 
 def setup(config: Config, organization: str, project: str, role: str):
-    removes_old_hook_file()
     write_hook_script()
+    removes_old_hook_file()
     write_pre_push_script()
     setup_config(config, organization, project, role)
 
