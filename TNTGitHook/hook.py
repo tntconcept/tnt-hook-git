@@ -9,7 +9,6 @@ from datetime import timezone
 from functools import reduce
 from pathlib import Path
 from typing import List, Tuple
-from pathlib import Path
 
 import keyring
 import requests
@@ -19,7 +18,7 @@ from requests import Response
 from TNTGitHook.entities import *
 from TNTGitHook.exceptions import NoCredentialsError, AuthError, NotFoundError, NetworkError, \
     CommitMessagesFileNotFoundError, CommitMessageFormatError, CommitMessagesFileFormatError, \
-    EmptyCommitMessagesFileError, InvalidSetupConfigurationError
+    InvalidSetupConfigurationError
 from TNTGitHook.utils import DateTimeEncoder, first, to_class, formatRemoteURL
 
 NAME: str = "TNTGitHook"
@@ -324,8 +323,6 @@ def parse_commit_messages(commit_msgs: str):
 
 def parse_commit_messages_from_file(commit_msgs_file: str):
     commit_msgs: str = read_commit_msgs(commit_msgs_file)
-    if not commit_msgs:
-        raise EmptyCommitMessagesFileError()
     try:
         return parse_commit_messages(commit_msgs)
     except Exception:
