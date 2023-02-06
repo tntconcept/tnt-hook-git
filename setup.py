@@ -7,11 +7,11 @@ setuptools.setup(
     name="TNTGitHook",
     version="0.9.0",
     author="Autentia",
-    author_email="info@autentia.com",
+    author_email="desktop.support@autentia.com",
     description="Utility to auto impute activities in TNT",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://gitlab.com/autentia/internal/TNTGitHook.git",
+    url="https://github.com/autentia/tnt-hook-git.git",
     packages=setuptools.find_packages(),
     license='Unlicense',
     classifiers=[
