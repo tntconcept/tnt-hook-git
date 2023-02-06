@@ -311,8 +311,9 @@ def check_organization_exists(config, headers, organization_name):
 
 def parse_commit_messages(commit_msgs: str):
     def msg_parser(msg: str) -> Tuple[str, str, str, str]:
-        items = msg.split(";")
+        items = msg.strip().split(";")
         if len(items) != 4:
+            print(f"Expected length is not 4: {len(items)}")
             raise CommitMessageFormatError()
         return items[0], items[1], items[2], items[3]
 
