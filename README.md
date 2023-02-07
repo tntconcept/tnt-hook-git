@@ -115,7 +115,7 @@ And give it execution permission:
 chmod +x .git/hooks/pre-push
 ```
 
-Create this directory in your home directory: `~/.tnt/hook/bin` and create a file `tnt_git_hook.sh`with the following content:
+Create this directory in your home directory: `$HOME/.tnt/hook/bin` and create a file `tnt_git_hook.sh`with the following content:
 ```bash
 #!/usr/bin/env bash
 set -o pipefail
@@ -184,7 +184,7 @@ popd
 And give it execution permission:
 
 ```bash
-chmod +x ~/.tnt/hook/bin/tnt_git_hook
+chmod +x $HOME/.tnt/hook/bin/tnt_git_hook
 ```
 ### Build release (DEPRECATED)
 
