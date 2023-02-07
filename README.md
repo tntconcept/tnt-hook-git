@@ -106,7 +106,7 @@ Create the following script on `<your-git-project>/.git/hooks/pre-push`
 set -o pipefail
 
 read local_ref local_sha remote_ref remote_sha
-~/.tnt/hook/bin/tnt_git_hook $local_ref $local_sha $remote_ref $remote_sha $(git rev-parse --show-toplevel)
+$HOME/.tnt/hook/bin/tnt_git_hook $local_ref $local_sha $remote_ref $remote_sha $(git rev-parse --show-toplevel)
 ```
 
 And give it execution permission:
