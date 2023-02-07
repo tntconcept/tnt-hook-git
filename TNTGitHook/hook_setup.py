@@ -2,12 +2,13 @@ import hashlib
 from pathlib import Path
 
 from TNTGitHook import hook
+from TNTGitHook.utils import hook_installation_path
 from TNTGitHook.hook import write_hook_script, Config, setup_config, removes_old_hook_file
 from TNTGitHook.pre_push import PrePush
 
 
 def is_update_needed():
-    hook_file = Path(f"{str(Path.home())}/.tnt/hook/bin/tnt_git_hook")
+    hook_file = Path(f"{hook_installation_path()}tnt_git_hook")
     if not hook_file.is_file():
         print("Hook not in the path")
         return True

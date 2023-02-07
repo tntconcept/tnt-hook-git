@@ -1,6 +1,7 @@
 import json
 import re
 from datetime import datetime
+from pathlib import Path
 from typing import Any, Iterable, Callable, TypeVar
 
 from TNTGitHook.entities import Organization
@@ -24,6 +25,10 @@ class OrganizationListDecoder(json.JSONDecoder):
 
 
 T = TypeVar('T')
+
+
+def hook_installation_path() -> str:
+    return f"{str(Path.home())}/.tnt/hook/bin/"
 
 
 def to_class(obj: dict, cls: T) -> T:

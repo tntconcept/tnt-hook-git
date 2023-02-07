@@ -19,7 +19,7 @@ from TNTGitHook.entities import *
 from TNTGitHook.exceptions import NoCredentialsError, AuthError, NotFoundError, NetworkError, \
     CommitMessagesFileNotFoundError, CommitMessageFormatError, CommitMessagesFileFormatError, \
     InvalidSetupConfigurationError
-from TNTGitHook.utils import DateTimeEncoder, first, to_class, formatRemoteURL
+from TNTGitHook.utils import DateTimeEncoder, first, to_class, formatRemoteURL, hook_installation_path
 
 NAME: str = "TNTGitHook"
 DEFAULT_CONFIG_FILE_PATH: str = f".git/hooks/{NAME}Config.json"
@@ -61,7 +61,6 @@ class PrjConfig:
     @staticmethod
     def activity_prefix() -> str:
         return "###Autocreated evidence###\n(DO NOT DELETE)"
-
 
 def setup_config(config: Config, selected_organization: str, selected_project: str, selected_role: str):
     setup_config_with_path(config, selected_organization, selected_project, selected_role, DEFAULT_CONFIG_FILE_PATH)
@@ -137,7 +136,7 @@ def write_hook_script():
 
 
 def creates_hook_directory():
-    users_path = f"{str(Path.home())}/.tnt/hook/bin/"
+    users_path = hook_installation_path()
     if not Path(users_path).exists():
         os.makedirs(users_path)
     return users_path
