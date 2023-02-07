@@ -81,23 +81,19 @@ Once utility is installed, in order to auto imputate on each git push, you must 
 **This configuration is per git repository!**
 
 ```bash
-python3 -m TNTGitHook --setup
-```
-
-It will prompt you for the organization, project and role names (they must match exactly with the ones on TNT, otherwise tool will complain).
-
-If you don't want the prompt for each command due:
-- To having several repositories to manage.
-- Want to use the setup in a script.
-
-Can use the following command instead that will not require any prompt to do the setup:
-
-**This configuration is per git repository!**
-
-```bash
 python3 -m TNTGitHook --setup --organization "ORGANIZATION" --project "PROJECT" --role "ROLE"
 ```
 
+You can also use the setup command without parameters if the file ** .git/hooks/TNTGitHookConfig.json ** exists in your git project directory.
+This file should have the following format in order to configure the organization, project and role for the evidence:
+
+```json
+{
+    "organization": "Some organization",
+    "project": "Project",
+    "role": "Role"
+}
+```
 
 ### Manual Setup
 
@@ -110,9 +106,7 @@ Create the following script on `<your-git-project>/.git/hooks/pre-push`
 set -o pipefail
 
 read local_ref local_sha remote_ref remote_sha
-PROJECT_PATH=$(git rev-parse --show-toplevel)
-# Assumes tnt_git_hook.sh is on PATH
-tnt_git_hook $local_ref $local_sha $remote_ref $remote_sha $PROJECT_PATH
+$HOME/.tnt/hook/bin/tnt_git_hook $local_ref $local_sha $remote_ref $remote_sha $(git rev-parse --show-toplevel)
 ```
 
 And give it execution permission:
@@ -121,17 +115,7 @@ And give it execution permission:
 chmod +x .git/hooks/pre-push
 ```
 
-Also create a file **.git/hooks/TNTGitHookConfig.json** to indicate to which project impute. Double check that the information is as showed in TNT. Example:
-
-```json
-{
-    "organization": "Some organization",
-    "project": "Project",
-    "role": "Role"
-}
-```
-
-Create this script in `/usr/local/bin/tnt_git_hook.sh`
+Create this directory in your home directory: `$HOME/.tnt/hook/bin` and create a file `tnt_git_hook.sh`with the following content:
 ```bash
 #!/usr/bin/env bash
 set -o pipefail
@@ -200,9 +184,11 @@ popd
 And give it execution permission:
 
 ```bash
-chmod +x /usr/local/bin/tnt_git_hook.sh
+chmod +x $HOME/.tnt/hook/bin/tnt_git_hook
 ```
-### Build release
+### Build release (DEPRECATED)
+
+**WARNING: This process has been deprecated. Please use the release GitHub workflow instead!!!**
 
 To build Pypi, modify setup.py accordingly (versions, name, etc) package.
 Verify that you don't have old execution folders:

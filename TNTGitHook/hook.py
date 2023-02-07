@@ -18,13 +18,14 @@ from requests import Response
 from TNTGitHook.entities import *
 from TNTGitHook.exceptions import NoCredentialsError, AuthError, NotFoundError, NetworkError, \
     CommitMessagesFileNotFoundError, CommitMessageFormatError, CommitMessagesFileFormatError, \
-    EmptyCommitMessagesFileError, InvalidSetupConfigurationError
-from TNTGitHook.utils import DateTimeEncoder, first, to_class, formatRemoteURL
+    InvalidSetupConfigurationError
+from TNTGitHook.utils import DateTimeEncoder, first, to_class, formatRemoteURL, hook_installation_path
 
 NAME: str = "TNTGitHook"
 DEFAULT_CONFIG_FILE_PATH: str = f".git/hooks/{NAME}Config.json"
 # In fact is 2048, but as we are going to substitute the last characters for \n... we need 5 empty at the end
 TNT_DESCRIPTION_MAX_SIZE = 2043
+
 
 
 class Config:
@@ -61,12 +62,12 @@ class PrjConfig:
     def activity_prefix() -> str:
         return "###Autocreated evidence###\n(DO NOT DELETE)"
 
-
 def setup_config(config: Config, selected_organization: str, selected_project: str, selected_role: str):
     setup_config_with_path(config, selected_organization, selected_project, selected_role, DEFAULT_CONFIG_FILE_PATH)
 
 
-def setup_config_with_path(config: Config, selected_organization: str, selected_project: str, selected_role: str, path: str):
+def setup_config_with_path(config: Config, selected_organization: str, selected_project: str, selected_role: str,
+                           path: str):
     try:
         prj_config_input = check_new_setup(path, selected_organization, selected_project, selected_role)
         headers = generate_request_headers(config)
@@ -101,8 +102,9 @@ def check_new_setup(path: str, organization: str, project: str, role: str):
         else:
             file = open(config_file)
             prj_config_file = json.load(file)
-            if is_valid_file_configuration(prj_config_file)\
-                    and is_valid_configuration(prj_config_file["organization"], prj_config_file["project"], prj_config_file["role"]):
+            if is_valid_file_configuration(prj_config_file) \
+                    and is_valid_configuration(prj_config_file["organization"], prj_config_file["project"],
+                                               prj_config_file["role"]):
                 return prj_config_file["organization"], prj_config_file["project"], prj_config_file["role"]
             else:
                 raise InvalidSetupConfigurationError()
@@ -121,13 +123,31 @@ def is_valid_file_configuration(config_file):
 def write_hook_script():
     hook_script = pkgutil.get_data('TNTGitHook', 'misc/tnt_git_hook.sh').decode('utf8')
     try:
-        path = f"/usr/local/bin/tnt_git_hook"
+        hook_directory = creates_hook_directory()
+        path = f"{hook_directory}tnt_git_hook"
         with open(path, "w") as file:
             file.write(hook_script)
             stats = os.stat(path)
             os.chmod(path, stats.st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
     except FileNotFoundError:
-        print(f"Unable to setup hook script. Are you able to write to /usr/local/bin?")
+        print(f"Unable to setup hook script. Are you able to write to {str(Path.home())}?")
+    except Exception as ex:
+        print(ex)
+
+
+def creates_hook_directory():
+    users_path = hook_installation_path()
+    if not Path(users_path).exists():
+        os.makedirs(users_path)
+    return users_path
+
+
+def removes_old_hook_file():
+    try:
+        exists = os.path.exists("/usr/local/bin/tnt_git_hook")
+        if exists:
+            print("The file exists. Trying to remove")
+            os.remove("/usr/local/bin/tnt_git_hook")
     except Exception as ex:
         print(ex)
 
@@ -302,8 +322,6 @@ def parse_commit_messages(commit_msgs: str):
 
 def parse_commit_messages_from_file(commit_msgs_file: str):
     commit_msgs: str = read_commit_msgs(commit_msgs_file)
-    if not commit_msgs:
-        raise EmptyCommitMessagesFileError()
     try:
         return parse_commit_messages(commit_msgs)
     except Exception:
@@ -326,7 +344,6 @@ def build_file_info(commit_msgs, commit_msgs_file):
 def generate_info(commit_msgs: [Tuple[str, str, datetime, str]],
                   existing_activity: Activity = None,
                   remote_url: str = None) -> (str, datetime):
-
     start_date: datetime = datetime.now().replace(hour=5, minute=0, second=0, microsecond=0, tzinfo=None)
 
     remote_url = "" if remote_url is None else remote_url + "\n"
@@ -343,7 +360,8 @@ def generate_info(commit_msgs: [Tuple[str, str, datetime, str]],
         result_str = add_evidence_with_no_remote_url(existing_activity, commit_msgs, remote_url)
 
     # Truncate description gracefully if description buffer overflows
-    result_str = (result_str[:TNT_DESCRIPTION_MAX_SIZE] + '\n...') if len(result_str) > TNT_DESCRIPTION_MAX_SIZE else result_str
+    result_str = (result_str[:TNT_DESCRIPTION_MAX_SIZE] + '\n...') if len(
+        result_str) > TNT_DESCRIPTION_MAX_SIZE else result_str
 
     return result_str, start_date
 
@@ -377,6 +395,7 @@ def add_new_evidence(existing_activity, msgs, remote_url):
     result_str += "\n###Autocreated evidence###\n(DO NOT DELETE)\n" + remote_url
     result_str += "\n-----\n".join(map(lambda m: "\n".join(m), msgs))
     return result_str
+
 
 def add_evidence_with_no_remote_url(existing_activity, msgs, remote_url):
     result_str = PrjConfig.activity_prefix() + "\n"

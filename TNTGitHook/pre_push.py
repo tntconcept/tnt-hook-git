@@ -4,6 +4,7 @@ import stat
 import sys
 from pathlib import Path
 from typing import List
+from TNTGitHook.utils import hook_installation_path
 
 
 class PrePush:
@@ -12,7 +13,7 @@ class PrePush:
     shebang: str = '#!/bin/bash'
     pipefail: str = 'set -o pipefail'
     readline: str = 'read local_ref local_sha remote_ref remote_sha'
-    tnt_call: str = 'tnt_git_hook $local_ref $local_sha $remote_ref $remote_sha $(git rev-parse --show-toplevel)'
+    tnt_call: str = f"{hook_installation_path()}tnt_git_hook $local_ref $local_sha $remote_ref $remote_sha $(git rev-parse --show-toplevel)"
     old_script_to_delete: List[str] = ['set -o pipefail', 'PROJECT_PATH', 'tnt_git_hook',
                                        'read local_ref local_sha remote_ref remote_sha']
 

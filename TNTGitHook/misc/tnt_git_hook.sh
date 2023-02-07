@@ -23,7 +23,7 @@ else
   gitlog_params="$local_ref --not $(git for-each-ref --format='%(refname)' refs/heads/ | grep -v "${local_ref}")"
 fi
 filename="/tmp/tnt-git-hook-commits-$(date +%s)"
-git log --pretty="format:%H;%aI;%an <%ae>;%s" $gitlog_params 1> $filename
+git log --pretty="format:%H;%aI;%an <%ae>;%f" $gitlog_params 1> $filename
 git_exit=$?
 
 if [ ! -s $filename ]
