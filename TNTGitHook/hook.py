@@ -124,7 +124,7 @@ def write_hook_script():
     hook_script = pkgutil.get_data('TNTGitHook', 'misc/tnt_git_hook.sh').decode('utf8')
     try:
         hook_directory = creates_hook_directory()
-        path = f"{hook_directory}/tnt_git_hook"
+        path = f"{hook_directory}tnt_git_hook"
         with open(path, "w") as file:
             file.write(hook_script)
             stats = os.stat(path)
