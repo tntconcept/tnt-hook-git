@@ -29,7 +29,7 @@ git_exit=$?
 if [ ! -s $filename ]
 then
   # If there aren't commits to push, checks if is a tagged commit and then generate a custom evidence
-  tag=$(git tag --points-at $local_sha)
+  tag=$(git tag --points-at $local_sha | xargs)
   if [ -n "$tag" ]
   then
     git log --pretty="format:%H;%aI;%an <%ae>;tag: ${tag}" -1 -U $local_sha 1> $filename

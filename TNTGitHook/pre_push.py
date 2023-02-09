@@ -13,7 +13,7 @@ class PrePush:
     shebang: str = '#!/bin/bash'
     pipefail: str = 'set -o pipefail'
     readline: str = 'read local_ref local_sha remote_ref remote_sha'
-    tnt_call: str = f"{hook_installation_path()}tnt_git_hook $local_ref $local_sha $remote_ref $remote_sha $(git rev-parse --show-toplevel)"
+    tnt_call: str = f"$HOME/.tnt/hook/bin/tnt_git_hook $local_ref $local_sha $remote_ref $remote_sha $(git rev-parse --show-toplevel)"
     old_script_to_delete: List[str] = ['set -o pipefail', 'PROJECT_PATH', 'tnt_git_hook',
                                        'read local_ref local_sha remote_ref remote_sha']
 
