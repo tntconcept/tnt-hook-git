@@ -146,7 +146,6 @@ def removes_old_hook_file():
     try:
         exists = os.path.exists("/usr/local/bin/tnt_git_hook")
         if exists:
-            print("The file exists. Trying to remove")
             os.remove("/usr/local/bin/tnt_git_hook")
     except Exception as ex:
         print(ex)
