@@ -22,9 +22,9 @@ def get_last_version() -> str:
 
 
 def bump_minor_number(version_number: str) -> str:
-    # Return a copy of `version_number` with the minor number incremented
+    # Return a copy of `version_number` with the minor number incremented and patch number equals to zero
     major, minor, patch = version_number.split(".")
-    return f"{major}.{int(minor) + 1}.{patch}"
+    return f"{major}.{int(minor) + 1}.0"
 
 
 def replace_version_number(last_version_number: str, new_version_number: str):
