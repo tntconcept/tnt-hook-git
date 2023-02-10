@@ -27,7 +27,7 @@ class PrePush:
                 st = os.stat(path)
                 os.chmod(path, st.st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
         except FileNotFoundError:
-            print("Unable to setup hook. Is this a git repository?\nMaybe you're not at the root folder.")
+            print("\nUnable to setup hook. Is this a git repository?\nMaybe you're not at the root folder.")
         except Exception as ex:
             print(ex)
 
@@ -41,7 +41,7 @@ class PrePush:
                 return True
             return False
         except FileNotFoundError:
-            print("Unable to setup hook. Is this a git repository?\nMaybe you're not at the root folder.")
+            print("\nUnable to setup hook. Is this a git repository?\nMaybe you're not at the root folder.")
         except Exception as ex:
             print(ex)
 
@@ -95,17 +95,17 @@ class PrePush:
 
     def setup(self):
         if self.is_already_a_pre_push():
-            print("There is already a pre push file\n")
+            print("\nThere is already a pre push file\n")
             if self.is_pre_push_in_default_file():
                 print("Pre push already in file, nothing to do\n")
             else:
                 current_hook = self.read_hook()
-                print("=== Current hook ===\n")
+                print("=== Current hook ===")
                 print(current_hook)
-                print("== New hook ==\n")
+                print("\n== New hook ==")
                 new_hook = self.compose_pre_hook(current_hook)
                 print(new_hook)
-                want_write = input("Want to write it? y/n: ")
+                want_write = input("\nWant to write it? y/n: ")
                 if want_write.lower() == 'y':
                     self.write_hook(new_hook)
                 else:

@@ -86,12 +86,12 @@ def setup_config_with_path(config: Config, selected_organization: str, selected_
             with open(path, "w") as f:
                 f.write(json.dumps(prj_config.__dict__, sort_keys=True, indent=4))
         else:
-            print(f"********** Using project configuration found in {path}: **********\n"
+            print(f"\nUsing project configuration found in {path}:\n"
                   f"Organization: {prj_config_input[0]}\n"
                   f"Project: {prj_config_input[1]}\n"
                   f"Role: {prj_config_input[2]}\n")
     except FileNotFoundError:
-        print("Unable to setup config. Is this a git repository?\nMaybe you're not at the root folder.")
+        print("\nUnable to setup config. Is this a git repository?\nMaybe you're not at the root folder.")
     except Exception as ex:
         print(ex)
 
@@ -132,7 +132,7 @@ def write_hook_script():
             stats = os.stat(path)
             os.chmod(path, stats.st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
     except FileNotFoundError:
-        print(f"Unable to setup hook script. Are you able to write to {str(Path.home())}?")
+        print(f"\nUnable to setup hook script. Are you able to write to {str(Path.home())}?")
     except Exception as ex:
         print(ex)
 
