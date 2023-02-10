@@ -21,6 +21,8 @@ from TNTGitHook.exceptions import NoCredentialsError, AuthError, NotFoundError, 
     InvalidSetupConfigurationError
 from TNTGitHook.utils import DateTimeEncoder, first, to_class, formatRemoteURL, hook_installation_path
 
+OLD_TNT_GIT_HOOK_SCRIPT_PATH = "/usr/local/bin/tnt_git_hook"
+
 NAME: str = "TNTGitHook"
 DEFAULT_CONFIG_FILE_PATH: str = f".git/hooks/{NAME}Config.json"
 # In fact is 2048, but as we are going to substitute the last characters for \n... we need 5 empty at the end
@@ -144,9 +146,14 @@ def creates_hook_directory():
 
 def removes_old_hook_file():
     try:
-        exists = os.path.exists("/usr/local/bin/tnt_git_hook")
+        exists = os.path.exists(OLD_TNT_GIT_HOOK_SCRIPT_PATH)
         if exists:
-            os.remove("/usr/local/bin/tnt_git_hook")
+            has_access = os.access(OLD_TNT_GIT_HOOK_SCRIPT_PATH, os.W_OK)
+            if has_access:
+                os.remove(OLD_TNT_GIT_HOOK_SCRIPT_PATH)
+            else:
+                print("\nCannot delete old tnt_git_hook located in /usr/local/bin")
+                print("Please delete manually using: sudo rm /usr/local/bin/tnt_git_hook")
     except Exception as ex:
         print(ex)
 
