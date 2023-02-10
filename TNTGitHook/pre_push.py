@@ -100,9 +100,9 @@ class PrePush:
                 print("Pre push already in file, nothing to do\n")
             else:
                 current_hook = self.read_hook()
-                print("=== Current hook ===")
+                print("===== Current hook =====")
                 print(current_hook)
-                print("\n== New hook ==")
+                print("\n===== New hook =====")
                 new_hook = self.compose_pre_hook(current_hook)
                 print(new_hook)
                 want_write = input("\nWant to write it? y/n: ")
