@@ -21,6 +21,8 @@ from TNTGitHook.exceptions import NoCredentialsError, AuthError, NotFoundError, 
     InvalidSetupConfigurationError
 from TNTGitHook.utils import DateTimeEncoder, first, to_class, formatRemoteURL, hook_installation_path
 
+OLD_TNT_GIT_HOOK_SCRIPT_PATH = "/usr/local/bin/tnt_git_hook"
+
 NAME: str = "TNTGitHook"
 DEFAULT_CONFIG_FILE_PATH: str = f".git/hooks/{NAME}Config.json"
 # In fact is 2048, but as we are going to substitute the last characters for \n... we need 5 empty at the end
@@ -84,12 +86,12 @@ def setup_config_with_path(config: Config, selected_organization: str, selected_
             with open(path, "w") as f:
                 f.write(json.dumps(prj_config.__dict__, sort_keys=True, indent=4))
         else:
-            print(f"********** Using project configuration found in {path}: **********\n"
+            print(f"\nUsing project configuration found in {path}:\n"
                   f"Organization: {prj_config_input[0]}\n"
                   f"Project: {prj_config_input[1]}\n"
                   f"Role: {prj_config_input[2]}\n")
     except FileNotFoundError:
-        print("Unable to setup config. Is this a git repository?\nMaybe you're not at the root folder.")
+        print("\nUnable to setup config. Is this a git repository?\nMaybe you're not at the root folder.")
     except Exception as ex:
         print(ex)
 
@@ -130,7 +132,7 @@ def write_hook_script():
             stats = os.stat(path)
             os.chmod(path, stats.st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
     except FileNotFoundError:
-        print(f"Unable to setup hook script. Are you able to write to {str(Path.home())}?")
+        print(f"\nUnable to setup hook script. Are you able to write to {str(Path.home())}?")
     except Exception as ex:
         print(ex)
 
@@ -144,9 +146,14 @@ def creates_hook_directory():
 
 def removes_old_hook_file():
     try:
-        exists = os.path.exists("/usr/local/bin/tnt_git_hook")
+        exists = os.path.exists(OLD_TNT_GIT_HOOK_SCRIPT_PATH)
         if exists:
-            os.remove("/usr/local/bin/tnt_git_hook")
+            has_access = os.access(OLD_TNT_GIT_HOOK_SCRIPT_PATH, os.W_OK)
+            if has_access:
+                os.remove(OLD_TNT_GIT_HOOK_SCRIPT_PATH)
+            else:
+                print("\nCannot delete old tnt_git_hook located in /usr/local/bin")
+                print("Please delete manually using: sudo rm /usr/local/bin/tnt_git_hook")
     except Exception as ex:
         print(ex)
 
