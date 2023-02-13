@@ -152,8 +152,8 @@ def removes_old_hook_file():
             if has_access:
                 os.remove(OLD_TNT_GIT_HOOK_SCRIPT_PATH)
             else:
-                print("\nCannot delete old tnt_git_hook located in /usr/local/bin")
-                print("Please delete manually using: sudo rm /usr/local/bin/tnt_git_hook")
+                print("\nCannot delete old /usr/local/bin/tnt_git_hook")
+                print("This script is not used, please delete manually using: sudo rm /usr/local/bin/tnt_git_hook")
     except Exception as ex:
         print(ex)
 

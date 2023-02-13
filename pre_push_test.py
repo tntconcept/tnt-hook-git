@@ -46,6 +46,16 @@ class PrePushTestCase(unittest.TestCase):
                          "npm run test:ci\n"
                          f"$HOME/.tnt/hook/bin/tnt_git_hook $local_ref $local_sha $remote_ref $remote_sha $(git rev-parse --show-toplevel)")
 
+    def test_the_pre_push_is_composed_correctly_if_should_be_total_replaced(self):
+        pre_push_script = f"#!/bin/bash\n" \
+                          f"read local_ref local_sha remote_ref remote_sha\n" \
+                          f"tnt_git_hook $local_ref $local_sha $remote_ref $remote_sha $(git rev-parse --show-toplevel)"
+        self.assertEqual(self.pre_push.compose_pre_hook(pre_push_script),
+                         "#!/bin/bash\n"
+                         "set -o pipefail\n"
+                         "read local_ref local_sha remote_ref remote_sha\n"
+                         f"$HOME/.tnt/hook/bin/tnt_git_hook $local_ref $local_sha $remote_ref $remote_sha $(git rev-parse --show-toplevel)")
+
     def test_old_lines_are_removed(self):
         self.assertListEqual([],
                              self.pre_push.remove_old_script_lines(["read local_ref local_sha remote_ref remote_sha",

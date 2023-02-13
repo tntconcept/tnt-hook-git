@@ -74,8 +74,11 @@ class PrePush:
         lines_in_hook = current_hook.split("\n")
         if self.shebang_symbol in lines_in_hook[0]:
             lines_in_hook.pop(0)
-        given_hook = "\n".join(self.remove_old_script_lines(lines_in_hook))
-        return f"{self.shebang}\n{self.pipefail}\n{self.readline}\n{given_hook}\n{self.tnt_call}"
+        removed_old_script_lines = self.remove_old_script_lines(lines_in_hook)
+        given_hook = "\n".join(list(filter(None, removed_old_script_lines)))
+        if len(given_hook) > 0:
+            given_hook = "\n" + given_hook
+        return f"{self.shebang}\n{self.pipefail}\n{self.readline}{given_hook}\n{self.tnt_call}"
 
     def read_hook(self) -> str:
         return Path(self.path).read_text()
@@ -95,14 +98,14 @@ class PrePush:
 
     def setup(self):
         if self.is_already_a_pre_push():
-            print("\nThere is already a pre push file\n")
+            print("\nThere is already a pre push file")
             if self.is_pre_push_in_default_file():
-                print("Pre push already in file, nothing to do\n")
+                print("Pre push already in file, nothing to do")
             else:
                 current_hook = self.read_hook()
                 print("===== Current hook =====")
                 print(current_hook)
-                print("\n===== New hook =====")
+                print("===== New hook =====")
                 new_hook = self.compose_pre_hook(current_hook)
                 print(new_hook)
                 want_write = input("\nWant to write it? y/n: ")
