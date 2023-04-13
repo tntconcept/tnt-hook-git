@@ -44,11 +44,11 @@ class Config:
     @staticmethod
     def config(debug: bool) -> Config:
         if debug:
-            return Config(baseURL="http://localhost:8080/api/",
+            return Config(baseURL="http://localhost:8080/tnt-api/api-hook/",
                           authURL="http://localhost:8080/oauth/token",
                           basic_auth="dG50LWNsaWVudDpob2xh")
         else:
-            return Config(baseURL="https://tnt.autentia.com/tntconcept-api-rest-kotlin/api/",
+            return Config(baseURL="https://tnt.autentia.com/tnt-api/api-hook/",
                           authURL="https://tnt.autentia.com/tntconcept-api-rest-kotlin/oauth/token",
                           basic_auth="dG50LWNsaWVudDpDbGllbnQtVE5ULXYx")
 
@@ -72,10 +72,9 @@ def setup_config_with_path(config: Config, selected_organization: str, selected_
                            path: str):
     try:
         prj_config_input = check_new_setup(path, selected_organization, selected_project, selected_role)
-        headers = generate_request_headers(config)
-        organization = check_organization_exists(config, headers, prj_config_input[0])
-        project = check_project_exists(config, headers, organization, prj_config_input[1])
-        role = check_role_exists(config, headers, project, prj_config_input[2])
+        organization = check_organization_exists(config, prj_config_input[0])
+        project = check_project_exists(config, organization, prj_config_input[1])
+        role = check_role_exists(config, project, prj_config_input[2])
 
         prj_config = PrjConfig()
         prj_config.organization = organization.name
@@ -183,19 +182,19 @@ def create_activity(config: Config,
     role_name = prj_config.role
     billable = False
 
-    headers = generate_request_headers(config)
+    username, password = retrieve_keychain_credentials()
 
-    organization = check_organization_exists(config, headers, organization_name)
+    organization = check_organization_exists(config, organization_name)
 
-    project = check_project_exists(config, headers, organization, project_name)
+    project = check_project_exists(config, organization, project_name)
 
-    role = check_role_exists(config, headers, project, role_name)
+    role = check_role_exists(config, project, role_name)
 
     now = datetime.now()
     now = now.strftime("%Y-%m-%d")
-    response: Response = requests.get(config.baseURL + "activities/",
-                                      params={"startDate": str(now), "endDate": str(now)},
-                                      headers=headers,
+    response: Response = requests.get(config.baseURL + "activity/",
+                                      params={"startDate": str(now), "endDate": str(now), "user": username},
+                                      headers={},
                                       timeout=config.timeout)
     activities = parse_activities(response.text)
     existing_activity = find_automatic_evidence(prj_config, activities)
@@ -211,12 +210,13 @@ def create_activity(config: Config,
     new_activity.duration = 0
     new_activity.billable = billable
     new_activity.projectRoleId = role.id
+    new_activity.username = username
 
     json_str = json.dumps(new_activity.__dict__, cls=DateTimeEncoder)
     data = json.loads(json_str)
 
-    response: Response = requests.post(config.baseURL + "activities?autotruncate",
-                                       headers=headers,
+    response: Response = requests.post(config.baseURL + "activity?autotruncate",
+                                       headers={},
                                        json=data,
                                        timeout=config.timeout)
     if response.status_code == 200:
@@ -276,9 +276,9 @@ def retrieve_keychain_credentials():
     return username, password
 
 
-def check_role_exists(config, headers, project, role_name):
-    response: Response = requests.get(config.baseURL + "projects/" + str(project.id) + "/roles",
-                                      headers=headers, timeout=config.timeout)
+def check_role_exists(config, project, role_name):
+    response: Response = requests.get(config.baseURL + "project/" + str(project.id) + "/role",
+                                      headers={}, timeout=config.timeout)
     response.encoding = 'utf-8'
     if response.status_code != 200:
         raise NetworkError()
@@ -289,9 +289,9 @@ def check_role_exists(config, headers, project, role_name):
     return role
 
 
-def check_project_exists(config, headers, organization, project_name):
-    response: Response = requests.get(config.baseURL + "organizations/" + str(organization.id) + "/projects",
-                                      headers=headers, timeout=config.timeout)
+def check_project_exists(config, organization, project_name):
+    response: Response = requests.get(config.baseURL + "organization/" + str(organization.id) + "/project",
+                                      headers={}, timeout=config.timeout)
     response.encoding = 'utf-8'
     if response.status_code != 200:
         raise NetworkError()
@@ -302,8 +302,8 @@ def check_project_exists(config, headers, organization, project_name):
     return project
 
 
-def check_organization_exists(config, headers, organization_name):
-    response: Response = requests.get(config.baseURL + "organizations", headers=headers, timeout=config.timeout)
+def check_organization_exists(config, organization_name):
+    response: Response = requests.get(config.baseURL + "organization", headers={}, timeout=config.timeout)
     response.encoding = 'utf-8'
     if response.status_code != 200:
         raise NetworkError()
