@@ -210,7 +210,7 @@ def create_activity(config: Config,
     new_activity.duration = 0
     new_activity.billable = billable
     new_activity.projectRoleId = role.id
-    new_activity.username = username
+    new_activity.userName = username
 
     json_str = json.dumps(new_activity.__dict__, cls=DateTimeEncoder)
     data = json.loads(json_str)

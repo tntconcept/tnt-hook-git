@@ -105,7 +105,7 @@ class CreateActivityRequest:
     description: str
     billable: bool
     projectRoleId: int
-    username: str
+    userName: str
 
 
 class FileInfo:
