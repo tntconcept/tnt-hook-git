@@ -44,7 +44,7 @@ class Config:
     @staticmethod
     def config(debug: bool) -> Config:
         if debug:
-            return Config(baseURL="http://localhost:8080/tnt-api/api-hook/",
+            return Config(baseURL="http://localhost:8080/api-hook/",
                           authURL="http://localhost:8080/oauth/token",
                           basic_auth="dG50LWNsaWVudDpob2xh")
         else:
