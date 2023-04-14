@@ -78,36 +78,6 @@ class HookTestCase(unittest.TestCase):
         self.assertEqual(error.exception.path, "resources/invalid_branch_commits2")
         self.assertTrue(error.exception.path_write_permissions)
 
-    @patch('TNTGitHook.hook.retrieve_keychain_credentials')
-    @httpretty.activate(verbose=True, allow_net_connect=False)
-    def test_error_retrieving_auth_token(self, mock_keyring: MagicMock):
-        httpretty.register_uri(
-            httpretty.POST,
-            self.config.authURL,
-            status=401
-        )
-        mock_keyring.return_value = "user", "password"
-        self.assertRaises(AuthError, hook.generate_request_headers, self.config)
-        # with self.assertRaises(AuthError):
-        #     hook.generate_request_headers(config)
-
-    # With patch we avoid to call the OS native keychain
-    @patch('TNTGitHook.hook.retrieve_keychain_credentials')
-    @httpretty.activate(verbose=True, allow_net_connect=False)
-    def test_retrieve_auth_token(self, mock_credentials: MagicMock):
-        httpretty.register_uri(
-            httpretty.POST,
-            self.config.authURL,
-            status=200,
-            body=self.fake_auth_token
-        )
-        # Training the function return value
-        mock_credentials.return_value = "user", "password"
-
-        headers = hook.generate_request_headers(self.config)
-        self.assertEqual(headers, {'Authorization': 'Bearer mehmehmeh'})
-        httpretty.disable()
-
     def test_recovery_old_credentials(self):
         with patch('keyring.get_password') as mock_get_password:
             mock_get_password.side_effect = [None, "user", "pass"]
@@ -130,96 +100,96 @@ class HookTestCase(unittest.TestCase):
     def test_organization_not_reachable(self):
         httpretty.register_uri(
             httpretty.GET,
-            self.config.baseURL + "organizations",
+            self.config.baseURL + "organization",
             status=404
         )
-        self.assertRaises(NetworkError, hook.check_organization_exists, self.config, "", "Not Reachable")
+        self.assertRaises(NetworkError, hook.check_organization_exists, self.config, "Not Reachable")
 
     @httpretty.activate(verbose=True, allow_net_connect=False)
     def test_organization_not_found(self):
         httpretty.register_uri(
             httpretty.GET,
-            self.config.baseURL + "organizations",
+            self.config.baseURL + "organization",
             body=self.fake_organizations,
             status=200
 
         )
-        self.assertRaises(NotFoundError, hook.check_organization_exists, self.config, "", "Not Exists")
+        self.assertRaises(NotFoundError, hook.check_organization_exists, self.config, "Not Exists")
 
     @httpretty.activate(verbose=True, allow_net_connect=False)
     def test_organization_found(self):
         httpretty.register_uri(
             httpretty.GET,
-            self.config.baseURL + "organizations",
+            self.config.baseURL + "organization",
             body=self.fake_organizations,
             status=200
 
         )
-        response = hook.check_organization_exists(self.config, "", "Test Organization")
+        response = hook.check_organization_exists(self.config, "Test Organization")
         self.assertEqual(0, response.id)
 
     @httpretty.activate(verbose=True, allow_net_connect=False)
     def test_project_not_reachable(self):
         httpretty.register_uri(
             httpretty.GET,
-            self.config.baseURL + "organizations/0/projects",
+            self.config.baseURL + "organization/0/project",
             status=404
         )
-        self.assertRaises(NetworkError, hook.check_project_exists, self.config, "", self.organizationA, "Not Reachable")
+        self.assertRaises(NetworkError, hook.check_project_exists, self.config, self.organizationA, "Not Reachable")
 
     @httpretty.activate(verbose=True, allow_net_connect=False)
     def test_project_not_found(self):
         httpretty.register_uri(
             httpretty.GET,
-            self.config.baseURL + "organizations/0/projects",
+            self.config.baseURL + "organization/0/project",
             body=self.json_projects,
             status=200
 
         )
-        self.assertRaises(NotFoundError, hook.check_project_exists, self.config, "", self.organizationA, "Not Exists")
+        self.assertRaises(NotFoundError, hook.check_project_exists, self.config, self.organizationA, "Not Exists")
 
     @httpretty.activate(verbose=True, allow_net_connect=False)
     def test_project_found(self):
         httpretty.register_uri(
             httpretty.GET,
-            self.config.baseURL + "organizations/0/projects",
+            self.config.baseURL + "organization/0/project",
             body=self.json_projects,
             status=200
 
         )
-        response = hook.check_project_exists(self.config, "", self.organizationA, "Test Project")
+        response = hook.check_project_exists(self.config, self.organizationA, "Test Project")
         self.assertEqual(0, response.id)
 
     @httpretty.activate(verbose=True, allow_net_connect=False)
     def test_role_not_reachable(self):
         httpretty.register_uri(
             httpretty.GET,
-            self.config.baseURL + "projects/0/roles",
+            self.config.baseURL + "project/0/role",
             status=404
         )
-        self.assertRaises(NetworkError, hook.check_role_exists, self.config, "", self.projectA, "Not Reachable")
+        self.assertRaises(NetworkError, hook.check_role_exists, self.config, self.projectA, "Not Reachable")
 
     @httpretty.activate(verbose=True, allow_net_connect=False)
     def test_role_not_found(self):
         httpretty.register_uri(
             httpretty.GET,
-            self.config.baseURL + "projects/0/roles",
+            self.config.baseURL + "project/0/role",
             body=self.json_roles,
             status=200
 
         )
-        self.assertRaises(NotFoundError, hook.check_role_exists, self.config, "", self.projectA, "Not Exists")
+        self.assertRaises(NotFoundError, hook.check_role_exists, self.config, self.projectA, "Not Exists")
 
     @httpretty.activate(verbose=True, allow_net_connect=False)
     def test_role_found(self):
         httpretty.register_uri(
             httpretty.GET,
-            self.config.baseURL + "projects/0/roles",
+            self.config.baseURL + "project/0/role",
             body=self.json_roles,
             status=200
 
         )
-        response = hook.check_role_exists(self.config, "", self.projectA, "Test Role")
+        response = hook.check_role_exists(self.config, self.projectA, "Test Role")
         self.assertEqual(0, response.id)
 
     def test_find_evidence_should_return_None_if_this_is_the_first(self):
