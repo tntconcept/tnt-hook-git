@@ -215,7 +215,7 @@ def create_activity(config: Config,
     json_str = json.dumps(new_activity.__dict__, cls=DateTimeEncoder)
     data = json.loads(json_str)
 
-    response: Response = requests.post(config.baseURL + "activity?autotruncate",
+    response: Response = requests.post(config.baseURL + "activity",
                                        headers={},
                                        json=data,
                                        timeout=config.timeout)
