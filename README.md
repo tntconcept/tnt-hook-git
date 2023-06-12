@@ -151,7 +151,7 @@ then
   tag=$(git tag --points-at $local_sha | xargs)
   if [ -n "$tag" ]
   then
-    git log --pretty="format:%H;%aI;%an <%ae>;tag: ${tag}" -1 -U $local_sha 1> $filename
+    git log --pretty="format:%H;%aI;%an <%ae>;tag: ${tag}" -1 --no-patch $local_sha 1> $filename
     git_exit=$?
   fi
 fi
