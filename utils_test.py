@@ -32,7 +32,7 @@ class UtilsTestCase(unittest.TestCase):
             self.assertIsNotNone(activity.projectRole)
 
     def test_replace_user_and_token_when_remote_url_contains_them(self):
-        remoteURL = "https://nassr.mousati:ghp_LuToBb2F@github.com/user/dummy.git"
+        remoteURL = "https://nassr.mousati:ghp_LuToBb2F-@github.com/user/dummy.git"
         expectedRemoteURL = "https://****:****@github.com/user/dummy.git"
         formatedRemoteURL = formatRemoteURL(remoteURL)
         self.assertEqual(formatedRemoteURL, expectedRemoteURL)
