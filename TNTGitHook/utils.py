@@ -45,7 +45,7 @@ def first(function: Callable[[T], bool], iterable: Iterable[T]) -> T:
 def formatRemoteURL(remoteURL) -> str:
 
     userPattern = "\/+\w.*\:"
-    tokenPattern = "\:+([\w\d]*)@"
+    tokenPattern = "\:+([\w\d-]*)@"
 
     if(remoteURL is None):
         return remoteURL
