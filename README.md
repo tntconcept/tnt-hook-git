@@ -41,8 +41,10 @@ global.trusted-host='tnt.autentia.com'
 To install or upgrade the TNTGitHook utility run the following command:
 
 ```bash
-python3 -m pip install --upgrade TNTGitHook --user
+python3 -m pip install --upgrade TNTGitHook --user [--break-system-packages]
 ```
+
+**NOTE**: Use _break-system-packages_ flag in order to avoid _externally-managed-environment_ error when executing the previous command
 
 
 #### Credentials
